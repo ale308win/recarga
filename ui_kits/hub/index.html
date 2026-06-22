@@ -1,0 +1,161 @@
+<!-- @dsCard group="Hub" viewport="1000x620" name="Área do Atirador" subtitle="Portal central SSO — ferramentas, apresentação e link @ale308win" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Área do Atirador · @ale308win</title>
+<link rel="stylesheet" href="../../styles.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px}
+
+/* NAV */
+.nav{background:var(--bg-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;position:sticky;top:0;z-index:var(--z-header)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{font-size:22px}
+.nav-name{font-family:var(--font-heading);font-size:20px;font-weight:700;color:var(--gold);letter-spacing:3px;text-transform:uppercase}
+.nav-right{display:flex;align-items:center;gap:14px}
+.ig-link{display:inline-flex;align-items:center;gap:5px;color:var(--gold);text-decoration:none;font-family:var(--font-heading);font-size:12px;font-weight:700;letter-spacing:1px;opacity:.85;transition:opacity .15s}
+.ig-link:hover{opacity:1}
+.nav-user{color:var(--text-2);font-size:12px;font-family:var(--font-heading)}
+.nav-btn{background:none;border:1px solid var(--border);color:var(--text-2);font-family:var(--font-heading);font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s}
+.nav-btn:hover{border-color:var(--gold-d);color:var(--gold)}
+
+/* MAIN */
+.main{padding:28px 20px;max-width:1000px;margin:0 auto}
+.welcome{margin-bottom:24px}
+.welcome h1{font-family:var(--font-heading);font-size:28px;font-weight:700;letter-spacing:1px;margin-bottom:5px;color:var(--text)}
+.welcome p{color:var(--text-2);font-size:14px}
+
+/* TOOL GRID */
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:24px}
+.tool-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s;position:relative;overflow:hidden}
+.tool-card:hover{border-color:var(--gold-d)}
+.tool-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)}
+.tool-card.dim{opacity:.45}
+.tool-icon{font-size:28px}
+.tool-name{font-family:var(--font-heading);font-size:13px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+.tool-desc{color:var(--text);font-size:13px;line-height:1.4}
+.tool-sub{color:var(--text-2);font-size:11px;font-family:var(--font-heading);letter-spacing:.5px;flex-grow:1}
+.tool-btn{background:var(--gold);color:#000;border:none;font-family:var(--font-heading);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;border-radius:var(--radius-sm);cursor:pointer;align-self:flex-start;transition:filter .2s}
+.tool-btn:hover{filter:brightness(1.12)}
+.tool-btn.sec{background:var(--bg-4);color:var(--text);border:1px solid var(--border)}
+.tool-coming{color:var(--text-3);font-family:var(--font-heading);font-size:11px;letter-spacing:1px}
+
+/* ABOUT */
+.about{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:20px;overflow:hidden}
+.about-header{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.about-header span{font-family:var(--font-heading);font-size:14px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+.about-body{padding:20px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.video-ph{flex:0 0 auto;width:200px;height:112px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.video-ph-icon{font-size:28px;opacity:.35}
+.video-ph-label{font-family:var(--font-heading);font-size:10px;color:var(--text-3);letter-spacing:1px}
+.about-text h2{font-family:var(--font-heading);font-size:18px;font-weight:700;color:var(--text);letter-spacing:1px;margin-bottom:6px}
+.about-text p{color:var(--text-2);font-size:13px;line-height:1.7;margin-bottom:10px}
+
+/* INFO */
+.info-bar{padding:10px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;gap:8px;align-items:center;margin-bottom:20px}
+.info-bar span{font-size:12px;color:var(--text-2)}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-copy{font-family:var(--font-heading);font-size:11px;color:var(--text-3);letter-spacing:1px}
+
+@media(max-width:600px){.video-ph{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <span class="nav-logo">🎯</span>
+    <span class="nav-name">ALE308WIN</span>
+  </div>
+  <div class="nav-right">
+    <a class="ig-link" href="https://instagram.com/ale308win" target="_blank">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+      @ale308win
+    </a>
+    <span class="nav-user">ale@example.com</span>
+    <button class="nav-btn">SAIR</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="welcome">
+    <h1>Área do Atirador</h1>
+    <p>Bem-vindo, <strong style="color:var(--text)">Ale</strong>. Selecione uma ferramenta abaixo.</p>
+  </div>
+
+  <div class="tool-grid">
+    <div class="tool-card featured">
+      <span class="tool-icon">📚</span>
+      <div class="tool-name">Base de Recarga</div>
+      <div class="tool-desc">Tabelas e receitas de recarga</div>
+      <div class="tool-sub">Dados técnicos por calibre</div>
+      <button class="tool-btn" onclick="window.open('https://ale308win.github.io/recargas/')">ABRIR →</button>
+    </div>
+    <div class="tool-card">
+      <span class="tool-icon">🎯</span>
+      <div class="tool-name">Cronógrafo</div>
+      <div class="tool-desc">Registro &amp; Análise Balística</div>
+      <div class="tool-sub">AVG · SD · ES · FPS · Joules</div>
+      <button class="tool-btn sec" onclick="window.open('https://ale308win.github.io/cronografo/')">ABRIR →</button>
+    </div>
+    <div class="tool-card">
+      <span class="tool-icon">💰</span>
+      <div class="tool-name">Custo de Recarga</div>
+      <div class="tool-desc">Calcule seus custos por calibre</div>
+      <div class="tool-sub">Comparativo vs munição nova</div>
+      <button class="tool-btn">ABRIR →</button>
+    </div>
+    <div class="tool-card dim">
+      <span class="tool-icon">📐</span>
+      <div class="tool-name">BDC / Trajetória</div>
+      <div class="tool-desc">Compensação de queda balística</div>
+      <div class="tool-sub">Em breve</div>
+      <span class="tool-coming">EM BREVE</span>
+    </div>
+    <div class="tool-card dim">
+      <span class="tool-icon">📖</span>
+      <div class="tool-name">Manual de Cargas</div>
+      <div class="tool-desc">Receitas homologadas</div>
+      <div class="tool-sub">Em breve</div>
+      <span class="tool-coming">EM BREVE</span>
+    </div>
+  </div>
+
+  <div class="about">
+    <div class="about-header">
+      <span>▶</span><span>APRESENTAÇÃO</span>
+    </div>
+    <div class="about-body">
+      <iframe width="200" height="355" src="https://www.youtube.com/embed/WhUKTTZUcB4" title="@ale308win — Apresentação" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border-radius:4px;border:1px solid var(--border);flex:0 0 auto"></iframe>
+      <div class="about-text" style="flex:1;min-width:200px">
+        <h2>@ale308win</h2>
+        <p>Mais de <strong style="color:var(--text)">28 anos de experiência</strong> em tiro esportivo e recarga de munição para armas curtas e longas. Cursos práticos e ferramentas exclusivas para o atirador brasileiro.</p>
+        <a class="ig-link" href="https://instagram.com/ale308win" target="_blank">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          @ale308win
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-bar">
+    <span>💾</span>
+    <span>Dados salvos localmente neste navegador. Sincronização em nuvem em breve.</span>
+  </div>
+</div>
+
+<footer class="footer">
+  <span class="footer-copy">© ALE308WIN · ÁREA DO ATIRADOR</span>
+  <a class="ig-link" href="https://instagram.com/ale308win" target="_blank">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+    @ale308win
+  </a>
+</footer>
+
+</body>
+</html>

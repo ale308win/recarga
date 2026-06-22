@@ -1,0 +1,11 @@
+/* ALE308WIN — Web Fonts
+   Google Fonts substitutions; replace with licensed TTFs if available. */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+/* Semantic aliases */
+:root {
+  --font-heading: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body:    'Rajdhani', system-ui, sans-serif;
+  --font-mono:    'Share Tech Mono', 'Courier New', monospace;
+}

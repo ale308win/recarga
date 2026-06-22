@@ -1,0 +1,61 @@
+calibre,diametro_pol,diametro_mm,familia,tipo,status,ano_intro
+.22 Short,0.223,5.66,.22 rimfire,revolver/pistola,SAAMI,1857
+.22 Long,0.223,5.66,.22 rimfire,revolver/pistola,SAAMI,1871
+.22 LR,0.223,5.66,.22 rimfire,ambos,SAAMI,1887
+.22 WMR,0.224,5.69,.22 rimfire,revolver/pistola,SAAMI,1959
+.22 Remington Jet,0.222,5.64,.22,revolver,SAAMI,1961
+.221 Remington Fireball,0.224,5.69,.224,pistola,SAAMI,1963
+.22 TCM,0.224,5.69,.224,pistola,SAAMI,2012
+5.7x28 FN,0.224,5.70,5.7mm,pistola,SAAMI,1990
+4.6x30 HK,0.183,4.65,4.6mm,pistola,Militar,1999
+.25 ACP,0.251,6.38,.25,pistola,SAAMI,1905
+7.62x25 Tokarev,0.307,7.80,.30,pistola,CIP,1930
+7.63x25 Mauser,0.307,7.80,.30,pistola,CIP,1896
+.30 Luger,0.308,7.82,.30,pistola,CIP,1900
+.32 ACP,0.312,7.92,.32,pistola,SAAMI,1899
+.32 S&W,0.312,7.92,.32,revolver,SAAMI,1878
+.32 S&W Long,0.312,7.92,.32,revolver,SAAMI,1896
+.32 H&R Magnum,0.312,7.92,.32,revolver,SAAMI,1984
+.327 Federal Magnum,0.312,7.92,.32,revolver,SAAMI,2008
+.32-20 Winchester,0.312,7.92,.32,ambos,SAAMI,1882
+.380 ACP,0.355,9.02,9mm,pistola,SAAMI,1908
+9x18 Makarov,0.365,9.27,9mm,pistola,CIP,1946
+9mm Luger,0.355,9.02,9mm,ambos,SAAMI,1902
+9x21 IMI,0.355,9.02,9mm,pistola,CIP,1981
+9x23 Winchester,0.355,9.02,9mm,pistola,SAAMI,1996
+.38 Super,0.356,9.04,9mm,pistola,SAAMI,1929
+.38 ACP,0.356,9.04,9mm,pistola,SAAMI,1900
+9mm Browning Long,0.355,9.02,9mm,pistola,CIP,1903
+.357 SIG,0.355,9.02,9mm,pistola,SAAMI,1994
+.38 S&W,0.361,9.17,.38,revolver,SAAMI,1877
+.38 Short Colt,0.357,9.07,.38,revolver,SAAMI,1875
+.38 Long Colt,0.357,9.07,.38,revolver,SAAMI,1875
+.38 Special,0.357,9.07,.357,revolver,SAAMI,1898
+.357 Magnum,0.357,9.07,.357,ambos,SAAMI,1934
+.357 Remington Maximum,0.357,9.07,.357,revolver,SAAMI,1983
+.256 Winchester Magnum,0.257,6.53,.25,revolver,SAAMI,1960
+.40 S&W,0.400,10.16,.40,pistola,SAAMI,1990
+10mm Auto,0.400,10.16,.40,pistola,SAAMI,1983
+.38-40 Winchester,0.401,10.19,.40,ambos,SAAMI,1874
+.41 Remington Magnum,0.410,10.41,.41,revolver,SAAMI,1964
+.41 Action Express,0.410,10.41,.41,pistola,SAAMI,1986
+.44 Special,0.429,10.90,.44,revolver,SAAMI,1907
+.44 Magnum,0.429,10.90,.44,ambos,SAAMI,1955
+.44-40 Winchester,0.427,10.85,.44,ambos,SAAMI,1873
+.44 Russian,0.429,10.90,.44,revolver,SAAMI,1870
+.44 Auto Mag,0.429,10.90,.44,pistola,Wildcat,1971
+.45 ACP,0.451,11.45,.45,ambos,SAAMI,1905
+.45 Auto Rim,0.451,11.45,.45,revolver,SAAMI,1920
+.45 GAP,0.451,11.45,.45,pistola,SAAMI,2003
+.45 Colt,0.452,11.48,.45,revolver,SAAMI,1872
+.454 Casull,0.452,11.48,.45,revolver,SAAMI,1958
+.45 Winchester Magnum,0.451,11.45,.45,pistola,SAAMI,1979
+.45 Super,0.451,11.45,.45,pistola,Wildcat,1988
+.460 S&W Magnum,0.452,11.48,.45,revolver,SAAMI,2005
+.475 Linebaugh,0.475,12.07,.475,revolver,SAAMI,1986
+.480 Ruger,0.475,12.07,.475,revolver,SAAMI,2003
+.50 AE,0.500,12.70,.50,pistola,SAAMI,1988
+.500 S&W Magnum,0.500,12.70,.50,revolver,SAAMI,2003
+.500 Linebaugh,0.510,12.95,.50,revolver,Wildcat,1993
+.50 GI,0.500,12.70,.50,pistola,SAAMI,2004
+7.5 FK,0.308,7.82,7.5mm,pistola,CIP,2015

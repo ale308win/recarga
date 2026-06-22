@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Cronógrafo" description="Dashboard de sessões balísticas com tabela de velocidades, métricas SD/ES/AVG e grade de performance" -->
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{min-height:100vh;background:#0b0b0f;color:#ddd8c4;font-family:'Rajdhani',system-ui,sans-serif}
+    a{text-decoration:none}
+    input,select{outline:none}
+    input[type=number]::-webkit-inner-spin-button{display:none}
+  </style>
+</helmet>
+
+<!-- HEADER -->
+<div style="background:#101018;border-bottom:2px solid #8b7332;padding:0 20px;height:54px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100">
+  <span style="font-size:20px">🎯</span>
+  <span style="font-family:'Oswald',sans-serif;font-size:16px;color:#c09a3a;letter-spacing:1.5px;text-transform:uppercase;font-weight:600">Cronógrafo</span>
+  <div style="display:flex;gap:4px;margin-left:auto">
+    <button style="background:rgba(192,154,58,.12);border:1px solid #8b7332;color:#c09a3a;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:2px;cursor:pointer">Minhas Sessões</button>
+    <button style="background:#c09a3a;color:#000;border:none;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:2px;cursor:pointer">+ Nova Sessão</button>
+    <a href="https://instagram.com/ale308win" target="_blank" style="display:flex;align-items:center;gap:4px;color:#999887;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;padding:5px 12px;border:1px solid #2a2a3a;border-radius:2px">@ale308win</a>
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+<div style="max-width:1200px;margin:12px auto 0;padding:0 16px">
+  <div style="background:rgba(192,154,58,.08);border:1px solid #2a2a3a;border-left:3px solid #8b7332;padding:8px 14px;border-radius:0 2px 2px 0">
+    <p style="font-size:11px;color:#999887;line-height:1.5">⚠ <strong style="color:#ddd8c4">Dados de referência.</strong> Confirme sempre com o manual do fabricante. <a href="https://instagram.com/ale308win" style="color:#c09a3a">@ale308win</a></p>
+  </div>
+</div>
+
+<!-- SESSION GRID -->
+<div style="max-width:1200px;margin:16px auto;padding:0 16px 50px">
+  <div style="font-size:11px;color:#999887;margin-bottom:10px">3 sessões registradas</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+
+    <!-- CARD 1 -->
+    <div style="background:#161622;border:1px solid #2a2a3a;border-radius:4px;padding:16px">
+      <div style="font-family:'Oswald',sans-serif;font-size:20px;color:#d4b050;font-weight:700;letter-spacing:.5px;margin-bottom:4px">5.56×45</div>
+      <div style="font-size:12px;color:#999887;margin-bottom:8px;line-height:1.6"><strong style="color:#ddd8c4">15/06/2026</strong> · IA2 · SP — Cartucho · 4 cargas</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(46,125,50,.25);color:#81c784;border:1px solid rgba(46,125,50,.4);font-family:'Rajdhani',sans-serif">SD 8.3 fps</span>
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(46,125,50,.25);color:#81c784;border:1px solid rgba(46,125,50,.4);font-family:'Rajdhani',sans-serif">ES 22 fps</span>
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(124,179,66,.2);color:#aed581;border:1px solid rgba(124,179,66,.35);font-family:'Rajdhani',sans-serif">AVG 2847 fps</span>
+      </div>
+      <div style="font-size:12px;color:#999887;margin-bottom:10px">1 694 J · Ensolarado · 28°C · 740m</div>
+      <div style="display:flex;gap:6px">
+        <button style="padding:5px 12px;background:rgba(192,154,58,.12);border:1px solid #8b7332;color:#c09a3a;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer">Editar</button>
+        <button style="padding:5px 12px;background:#1e1e2e;border:1px solid #383850;color:#999887;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer">📊 Excel</button>
+        <button style="padding:5px 12px;background:rgba(198,40,40,.1);border:1px solid rgba(198,40,40,.3);color:#ef9a9a;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer;margin-left:auto">Excluir</button>
+      </div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div style="background:#161622;border:1px solid #2a2a3a;border-radius:4px;padding:16px">
+      <div style="font-family:'Oswald',sans-serif;font-size:20px;color:#d4b050;font-weight:700;letter-spacing:.5px;margin-bottom:4px">.308 Winchester</div>
+      <div style="font-size:12px;color:#999887;margin-bottom:8px;line-height:1.6"><strong style="color:#ddd8c4">10/06/2026</strong> · Tikka T3x · SP — Cartucho · 2 cargas</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(124,179,66,.2);color:#aed581;border:1px solid rgba(124,179,66,.35);font-family:'Rajdhani',sans-serif">SD 12.1 fps</span>
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(124,179,66,.2);color:#aed581;border:1px solid rgba(124,179,66,.35);font-family:'Rajdhani',sans-serif">ES 38 fps</span>
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(124,179,66,.2);color:#aed581;border:1px solid rgba(124,179,66,.35);font-family:'Rajdhani',sans-serif">AVG 2650 fps</span>
+      </div>
+      <div style="font-size:12px;color:#999887;margin-bottom:10px">3 481 J · Nublado · 22°C · 740m</div>
+      <div style="display:flex;gap:6px">
+        <button style="padding:5px 12px;background:#1e1e2e;border:1px solid #383850;color:#999887;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer">Editar</button>
+        <button style="padding:5px 12px;background:#1e1e2e;border:1px solid #383850;color:#999887;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer">📊 Excel</button>
+        <button style="padding:5px 12px;background:rgba(198,40,40,.1);border:1px solid rgba(198,40,40,.3);color:#ef9a9a;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer;margin-left:auto">Excluir</button>
+      </div>
+    </div>
+
+    <!-- CARD 3 -->
+    <div style="background:#161622;border:1px solid #2a2a3a;border-radius:4px;padding:16px">
+      <div style="font-family:'Oswald',sans-serif;font-size:20px;color:#d4b050;font-weight:700;letter-spacing:.5px;margin-bottom:4px">9mm Luger</div>
+      <div style="font-size:12px;color:#999887;margin-bottom:8px;line-height:1.6"><strong style="color:#ddd8c4">05/06/2026</strong> · T9 · SP — Cartucho · 3 cargas</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(249,168,37,.2);color:#ffd54f;border:1px solid rgba(249,168,37,.35);font-family:'Rajdhani',sans-serif">SD 18.4 fps</span>
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(249,168,37,.2);color:#ffd54f;border:1px solid rgba(249,168,37,.35);font-family:'Rajdhani',sans-serif">ES 54 fps</span>
+        <span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(124,179,66,.2);color:#aed581;border:1px solid rgba(124,179,66,.35);font-family:'Rajdhani',sans-serif">AVG 1142 fps</span>
+      </div>
+      <div style="font-size:12px;color:#999887;margin-bottom:10px">481 J · Indoor · 25°C</div>
+      <div style="display:flex;gap:6px">
+        <button style="padding:5px 12px;background:#1e1e2e;border:1px solid #383850;color:#999887;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer">Editar</button>
+        <button style="padding:5px 12px;background:#1e1e2e;border:1px solid #383850;color:#999887;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer">📊 Excel</button>
+        <button style="padding:5px 12px;background:rgba(198,40,40,.1);border:1px solid rgba(198,40,40,.3);color:#ef9a9a;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;cursor:pointer;margin-left:auto">Excluir</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- METRICS LEGEND -->
+  <div style="margin-top:20px;background:#161622;border:1px solid #2a2a3a;border-radius:4px;overflow:hidden">
+    <div style="background:#1e1e2e;border-bottom:1px solid #2a2a3a;padding:9px 16px">
+      <span style="color:#c09a3a;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase">🔬 Escala de Performance</span>
+    </div>
+    <div style="padding:14px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span style="display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(46,125,50,.25);color:#81c784;border:1px solid rgba(46,125,50,.4);font-family:'Rajdhani',sans-serif">Excelente SD&lt;10</span>
+      <span style="display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(124,179,66,.2);color:#aed581;border:1px solid rgba(124,179,66,.35);font-family:'Rajdhani',sans-serif">Bom SD 10–15</span>
+      <span style="display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(249,168,37,.2);color:#ffd54f;border:1px solid rgba(249,168,37,.35);font-family:'Rajdhani',sans-serif">Aceitável SD 15–25</span>
+      <span style="display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(230,81,0,.2);color:#ffb74d;border:1px solid rgba(230,81,0,.35);font-family:'Rajdhani',sans-serif">Ruim SD 25–35</span>
+      <span style="display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(198,40,40,.25);color:#ef9a9a;border:1px solid rgba(198,40,40,.4);font-family:'Rajdhani',sans-serif">Crítico SD&gt;35</span>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+</body>
+</html>

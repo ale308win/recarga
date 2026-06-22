@@ -1,0 +1,326 @@
+<!-- @dsCard group="Recargas" viewport="980x640" name="Base de Recargas" subtitle="App de referência: filtros + cards expandíveis de cargas por calibre" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base de Recarga — @ale308win</title>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Saira:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* --- RECARGAS PALETTE (warm brown — distinct from Cronógrafo cool dark) --- */
+:root {
+  --bg:       #14120e;
+  --surface:  #1d1a14;
+  --surface2: #26221a;
+  --line:     #35301f;
+  --gold:     #c9a14a;
+  --gold-hi:  #e8c97a;
+  --gold-dim: #8a7235;
+  --text:     #ece6d8;
+  --muted:    #9a9279;
+  --faint:    #6f6855;
+  --ok:       #8fae6a;
+  --warn:     #d9913d;
+  --radius:   10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Saira',system-ui,sans-serif;font-size:15px;line-height:1.45}
+a{color:var(--gold);text-decoration:none}
+a:hover{color:var(--gold-hi)}
+
+/* --- HEADER --- */
+header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,#14120e 75%,rgba(20,18,14,.94));backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.hwrap{max-width:980px;margin:0 auto;padding:14px 16px 12px}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand h1{font-family:'Saira Condensed';font-weight:700;font-size:clamp(22px,4.5vw,30px);letter-spacing:.04em;text-transform:uppercase;color:var(--gold-hi);line-height:1}
+.brand a{font-family:'Saira Condensed';font-weight:500;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);transition:color .15s}
+.rule{height:2px;background:linear-gradient(90deg,var(--gold) 0,var(--gold-dim) 45%,transparent 100%);margin:10px 0 12px;border-radius:2px}
+
+/* --- FILTERS --- */
+.filters{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:680px){.filters{grid-template-columns:1.3fr 1fr 1fr 1.2fr}}
+.field{position:relative}
+.field label{position:absolute;top:-7px;left:10px;background:var(--bg);padding:0 6px;font-family:'Saira Condensed';font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);z-index:1}
+select,input[type="search"]{width:100%;appearance:none;-webkit-appearance:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);color:var(--text);font-family:'Saira';font-size:15px;padding:12px 36px 11px 12px;outline:none;transition:border-color .15s}
+select:focus,input:focus{border-color:var(--gold)}
+.field::after{content:"";position:absolute;right:13px;top:50%;width:8px;height:8px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:translateY(-65%) rotate(45deg);pointer-events:none}
+.field.search::after{display:none}
+input[type="search"]{padding-right:12px}
+input::placeholder{color:var(--faint)}
+select option{background:var(--surface)}
+
+/* --- STATUS / DISC --- */
+.status{max-width:980px;margin:0 auto;padding:10px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.count{font-family:'IBM Plex Mono';font-size:13px;color:var(--muted)}
+.count b{color:var(--gold-hi);font-weight:600}
+.btn-clear{background:none;border:1px solid var(--line);color:var(--muted);font-family:'Saira Condensed';font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:99px;cursor:pointer;transition:.15s}
+.btn-clear:hover{border-color:var(--gold);color:var(--gold-hi)}
+.disc{max-width:980px;margin:12px auto 0;padding:0 16px}
+.disc-inner{border:1px solid #5c3b22;background:#241a12;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:#d8b48a;line-height:1.5}
+.disc-inner strong{color:#eccb9a}
+.disc-inner a{color:#eccb9a;text-decoration:underline;text-underline-offset:2px}
+
+/* --- MAIN / GRID --- */
+main{max-width:980px;margin:0 auto;padding:14px 16px 50px}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+
+/* --- CARD --- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:border-color .15s}
+.card:hover{border-color:var(--gold-dim)}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px 14px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cal{font-family:'Saira Condensed';font-weight:700;font-size:20px;letter-spacing:.03em;color:var(--gold-hi);line-height:1.1}
+.powder{font-size:13.5px;color:var(--text);margin-top:2px}
+.powder span{color:var(--muted)}
+.badge{flex-shrink:0;font-family:'Saira Condensed';font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.badge.rev{color:var(--ok);border-color:#3d4a30;background:#1c2316}
+.badge.ter{color:var(--warn);border-color:#4a3a22;background:#241d12}
+.badge.rif{color:#64b5f6;border-color:#1a3050;background:#0d1e30}
+.proj{padding:0 14px 10px;font-size:13px;color:var(--muted);cursor:pointer}
+.proj b{color:var(--text);font-weight:500}
+.data{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);cursor:pointer}
+.cell{padding:9px 8px 8px;text-align:center;border-right:1px solid var(--line)}
+.cell:last-child{border-right:none}
+.cell .k{font-family:'Saira Condensed';font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:2px}
+.cell .v{font-family:'IBM Plex Mono';font-size:14px;font-weight:600;color:var(--text)}
+.cell .v small{font-size:10px;color:var(--muted);font-weight:400}
+.cell.hot .v{color:var(--gold-hi)}
+.range-bar{height:3px;margin:0 14px 12px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.range-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:3px}
+.expand-hint{text-align:center;padding:5px 0 7px;font-family:'Saira Condensed';font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);cursor:pointer;user-select:none}
+.card.open .expand-hint{display:none}
+.more{display:none;border-top:1px solid var(--line);padding:12px 14px;background:var(--surface2)}
+.card.open .more{display:block}
+.more dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13px}
+.more dt{color:var(--faint);font-family:'Saira Condensed';font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding-top:1px}
+.more dd{color:var(--text)}
+.more .obs{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--muted);line-height:1.5}
+
+footer{border-top:1px solid var(--line);padding:18px 16px 40px;text-align:center;font-size:12px;color:var(--faint)}
+footer .ft-brand{font-family:'Saira Condensed';font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:4px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <div class="brand">
+      <h1>Base de Recarga</h1>
+      <a href="https://www.instagram.com/ale308win" target="_blank" rel="noopener">criado por @ale308win</a>
+    </div>
+    <div class="rule"></div>
+    <div class="filters">
+      <div class="field">
+        <label for="fCal">Calibre</label>
+        <select id="fCal">
+          <option value="">Todos os calibres</option>
+          <option>.38 SPL</option><option>9mm Luger</option>
+          <option>.308 Winchester</option><option>.45 ACP</option>
+          <option>.357 Magnum</option><option>.40 S&amp;W</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fPow">Pólvora</label>
+        <select id="fPow">
+          <option value="">Todas</option>
+          <option>Titegroup</option><option>N320</option>
+          <option>IMR 4064</option><option>231</option>
+          <option>Unique</option><option>Varget</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fFab">Fabricante</label>
+        <select id="fFab">
+          <option value="">Todos</option>
+          <option>Hodgdon</option><option>Vihtavuori</option>
+          <option>IMR</option><option>Winchester</option><option>Alliant</option>
+        </select>
+      </div>
+      <div class="field search">
+        <label for="fTxt">Busca livre</label>
+        <input type="search" id="fTxt" placeholder="projétil, espoleta, observação…">
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="disc">
+  <div class="disc-inner">
+    <strong>⚠ Dados de referência.</strong> Sempre confirme com o manual do fabricante da pólvora e do projétil. Inicie com a carga mínima e nunca exceda a carga máxima. O uso destas informações é de responsabilidade exclusiva do recarregador.<br>
+    Material de apoio aos alunos do <a href="https://www.instagram.com/ale308win" target="_blank" rel="noopener">curso de recarga do @ale308win</a>.
+  </div>
+</div>
+
+<div class="status">
+  <div class="count"><b id="nShow">4</b> de <span id="nTotal">4</span> registros</div>
+  <button class="btn-clear" id="btnClear">Limpar filtros</button>
+</div>
+
+<main>
+  <div class="grid" id="grid">
+
+    <div class="card" data-cal=".38 SPL" data-pow="N320" data-fab="Vihtavuori" data-tipo="rev">
+      <div class="card-head" onclick="toggle(this)">
+        <div>
+          <div class="cal">.38 SPL</div>
+          <div class="powder">N320 <span>· Vihtavuori</span></div>
+        </div>
+        <span class="badge rev">Revólver</span>
+      </div>
+      <div class="proj" onclick="toggle(this)">Projétil: <b>158gr FMJ</b> · Espoleta: <b>Small Pistol 1½</b></div>
+      <div class="data" onclick="toggle(this)">
+        <div class="cell"><span class="k">Carga (gr)</span><div class="v">3,0<small>–3,4</small></div></div>
+        <div class="cell hot"><span class="k">Vel. (fps)</span><div class="v">820<small> avg</small></div></div>
+        <div class="cell"><span class="k">COAL</span><div class="v">1.455<small>"</small></div></div>
+      </div>
+      <div class="range-bar"><i style="width:72%"></i></div>
+      <div class="expand-hint" onclick="toggle(this)">▼ VER MAIS</div>
+      <div class="more">
+        <dl>
+          <dt>Carga mín.</dt><dd>3,0 gr</dd>
+          <dt>Carga máx.</dt><dd>3,4 gr</dd>
+          <dt>Velocidade</dt><dd>820 fps (avg)</dd>
+          <dt>Pressão</dt><dd>17 500 psi</dd>
+          <dt>COAL</dt><dd>1.455"</dd>
+          <dt>Espoleta</dt><dd>Small Pistol 1½</dd>
+          <dt>Cano</dt><dd>4"</dd>
+          <dt>Fonte</dt><dd>Manual Vihtavuori 2023</dd>
+        </dl>
+        <div class="obs">Carga clássica para .38 SPL. Boa velocidade com pressão segura. Confirme sempre com o manual Vihtavuori antes de usar.</div>
+      </div>
+    </div>
+
+    <div class="card" data-cal="9mm Luger" data-pow="Titegroup" data-fab="Hodgdon" data-tipo="ter">
+      <div class="card-head" onclick="toggle(this)">
+        <div>
+          <div class="cal">9mm Luger</div>
+          <div class="powder">Titegroup <span>· Hodgdon</span></div>
+        </div>
+        <span class="badge ter">Pistola</span>
+      </div>
+      <div class="proj" onclick="toggle(this)">Projétil: <b>124gr FMJ</b> · Espoleta: <b>Small Pistol 1½</b></div>
+      <div class="data" onclick="toggle(this)">
+        <div class="cell"><span class="k">Carga (gr)</span><div class="v">3,3<small>–3,7</small></div></div>
+        <div class="cell hot"><span class="k">Vel. (fps)</span><div class="v">1 090<small> avg</small></div></div>
+        <div class="cell"><span class="k">COAL</span><div class="v">1.169<small>"</small></div></div>
+      </div>
+      <div class="range-bar"><i style="width:68%"></i></div>
+      <div class="expand-hint" onclick="toggle(this)">▼ VER MAIS</div>
+      <div class="more">
+        <dl>
+          <dt>Carga mín.</dt><dd>3,3 gr</dd>
+          <dt>Carga máx.</dt><dd>3,7 gr</dd>
+          <dt>Velocidade</dt><dd>1 090 fps (avg)</dd>
+          <dt>Pressão</dt><dd>33 200 psi</dd>
+          <dt>COAL</dt><dd>1.169"</dd>
+          <dt>Espoleta</dt><dd>Small Pistol 1½</dd>
+          <dt>Cano</dt><dd>4"</dd>
+          <dt>Fonte</dt><dd>Manual Hodgdon 2024</dd>
+        </dl>
+        <div class="obs">Pólvora de queima limpa e eficiente. Popular para treino de volume. Reduza 10% para início de testes.</div>
+      </div>
+    </div>
+
+    <div class="card" data-cal=".308 Winchester" data-pow="IMR 4064" data-fab="IMR" data-tipo="rif">
+      <div class="card-head" onclick="toggle(this)">
+        <div>
+          <div class="cal">.308 Winchester</div>
+          <div class="powder">IMR 4064 <span>· IMR</span></div>
+        </div>
+        <span class="badge rif">Rifle</span>
+      </div>
+      <div class="proj" onclick="toggle(this)">Projétil: <b>168gr BTHP</b> · Espoleta: <b>Large Rifle 9½</b></div>
+      <div class="data" onclick="toggle(this)">
+        <div class="cell"><span class="k">Carga (gr)</span><div class="v">41,0<small>–44,0</small></div></div>
+        <div class="cell hot"><span class="k">Vel. (fps)</span><div class="v">2 600<small> avg</small></div></div>
+        <div class="cell"><span class="k">COAL</span><div class="v">2.800<small>"</small></div></div>
+      </div>
+      <div class="range-bar"><i style="width:80%"></i></div>
+      <div class="expand-hint" onclick="toggle(this)">▼ VER MAIS</div>
+      <div class="more">
+        <dl>
+          <dt>Carga mín.</dt><dd>41,0 gr</dd>
+          <dt>Carga máx.</dt><dd>44,0 gr</dd>
+          <dt>Velocidade</dt><dd>2 600 fps (avg)</dd>
+          <dt>Pressão</dt><dd>55 000 psi</dd>
+          <dt>COAL</dt><dd>2.800"</dd>
+          <dt>Espoleta</dt><dd>Large Rifle 9½</dd>
+          <dt>Cano</dt><dd>24"</dd>
+          <dt>Fonte</dt><dd>Manual IMR 2023</dd>
+        </dl>
+        <div class="obs">Carga precisa para .308 Win com projétil de competição. Excelente para 300–600m. Inicie sempre por 41,0gr.</div>
+      </div>
+    </div>
+
+    <div class="card" data-cal=".45 ACP" data-pow="231" data-fab="Winchester" data-tipo="ter">
+      <div class="card-head" onclick="toggle(this)">
+        <div>
+          <div class="cal">.45 ACP</div>
+          <div class="powder">231 <span>· Winchester</span></div>
+        </div>
+        <span class="badge ter">Pistola</span>
+      </div>
+      <div class="proj" onclick="toggle(this)">Projétil: <b>230gr FMJ</b> · Espoleta: <b>Large Pistol 2½</b></div>
+      <div class="data" onclick="toggle(this)">
+        <div class="cell"><span class="k">Carga (gr)</span><div class="v">5,0<small>–5,5</small></div></div>
+        <div class="cell hot"><span class="k">Vel. (fps)</span><div class="v">830<small> avg</small></div></div>
+        <div class="cell"><span class="k">COAL</span><div class="v">1.275<small>"</small></div></div>
+      </div>
+      <div class="range-bar"><i style="width:65%"></i></div>
+      <div class="expand-hint" onclick="toggle(this)">▼ VER MAIS</div>
+      <div class="more">
+        <dl>
+          <dt>Carga mín.</dt><dd>5,0 gr</dd>
+          <dt>Carga máx.</dt><dd>5,5 gr</dd>
+          <dt>Velocidade</dt><dd>830 fps (avg)</dd>
+          <dt>Pressão</dt><dd>18 900 psi</dd>
+          <dt>COAL</dt><dd>1.275"</dd>
+          <dt>Espoleta</dt><dd>Large Pistol 2½</dd>
+          <dt>Cano</dt><dd>5"</dd>
+          <dt>Fonte</dt><dd>Manual Winchester 2024</dd>
+        </dl>
+        <div class="obs">Carga clássica para .45 ACP. Queima limpa e ciclo confiável. Boa escolha para treino diário.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="ft-brand">Base de Recarga · @ale308win</div>
+  <div>Material de apoio ao curso de recarga · <a href="https://instagram.com/ale308win" target="_blank">@ale308win</a></div>
+</footer>
+
+<script>
+function toggle(el){el.closest('.card').classList.toggle('open')}
+const cards=[...document.querySelectorAll('.card')];
+function filter(){
+  const cal=document.getElementById('fCal').value.toLowerCase();
+  const pow=document.getElementById('fPow').value.toLowerCase();
+  const fab=document.getElementById('fFab').value.toLowerCase();
+  const txt=document.getElementById('fTxt').value.toLowerCase();
+  let n=0;
+  cards.forEach(c=>{
+    const show=(!cal||c.dataset.cal.toLowerCase().includes(cal))&&
+               (!pow||c.dataset.pow.toLowerCase().includes(pow))&&
+               (!fab||c.dataset.fab.toLowerCase().includes(fab))&&
+               (!txt||c.innerText.toLowerCase().includes(txt));
+    c.style.display=show?'':'none';
+    if(show)n++;
+  });
+  document.getElementById('nShow').textContent=n;
+}
+document.getElementById('fCal').addEventListener('change',filter);
+document.getElementById('fPow').addEventListener('change',filter);
+document.getElementById('fFab').addEventListener('change',filter);
+document.getElementById('fTxt').addEventListener('input',filter);
+document.getElementById('btnClear').addEventListener('click',()=>{
+  document.getElementById('fCal').selectedIndex=0;
+  document.getElementById('fPow').selectedIndex=0;
+  document.getElementById('fFab').selectedIndex=0;
+  document.getElementById('fTxt').value='';
+  filter();
+});
+</script>
+</body>
+</html>
