@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0d1117">
+  <title>ALE308WIN · Área do Atirador</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d1117; color: #e6edf3; font-family: 'Barlow', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    #root { min-height: 100vh; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #0d1117; }
+    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+    input[type="number"] { -moz-appearance: textfield; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .ale-input {
+      background: #1c2128; border: 1px solid #30363d; border-radius: 4px;
+      color: #e6edf3; font-family: 'Barlow', sans-serif; font-size: 14px;
+      padding: 8px 10px; width: 100%; outline: none; transition: border-color .15s;
+    }
+    .ale-input:focus { border-color: #d4a520; }
+    .ale-input::placeholder { color: #6e7681; }
+    select.ale-input { cursor: pointer; }
+    .ale-btn {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      letter-spacing: 1.5px; border: none; border-radius: 4px;
+      cursor: pointer; transition: filter .15s;
+    }
+    .ale-btn:hover { filter: brightness(1.12); }
+    .ale-btn:active { filter: brightness(0.9); }
+    .load-tab {
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1px;
+      font-size: 12px; padding: 6px 14px; border: 1px solid #30363d;
+      background: #161b22; color: #8b949e; cursor: pointer; border-radius: 4px; transition: all .15s;
+    }
+    .load-tab.on { background: #1c2128; color: #e6edf3; border-color: #d4a520; }
+    .load-tab:hover:not(.on) { color: #e6edf3; }
+    .two-col { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; }
+    @media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } .hide-sm { display: none !important; } }
+    @media (min-width: 861px) { .hide-lg { display: none !important; } }
+  </style>
+</head>
+<body>
+<script>
+const SUPA_URL='https://retjrajrouanbjzjbyxv.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJldGpyYWpyb3VhbmJqempieXh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NDczNDEsImV4cCI6MjA5NzEyMzM0MX0.RTUkvrUy-7RhOvtMOPq-BY5vswUOwqtyZuaR1XagDuE';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+</script>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useMemo } = React;
+const C = { bg:'#0d1117', sf:'#161b22', sf2:'#1c2128', sf3:'#21262d', bd:'#30363d', bds:'#21262d', tx:'#e6edf3', tx2:'#8b949e', tx3:'#6e7681', gold:'#d4a520', green:'#1a7f37', greenTx:'#aff5b4', red:'#8b1a1a' };
+
+/* ── REFERENCE DATA ────────────────────────────────────────────────────── */
+// Pistola/Revólver
+const CAL_CURTAS = ['.22 Short','.22 Long','.22 LR','.22 WMR','.22 Remington Jet','.221 Remington Fireball','.22 TCM','5.7x28 FN','4.6x30 HK','.25 ACP','7.62x25 Tokarev','7.63x25 Mauser','.30 Luger','.32 ACP','.32 S&W','.32 S&W Curto','.32 S&W Long','.32 H&R Magnum','.327 Federal Magnum','.32-20 Winchester','.380 ACP','.380 Auto +P','9x18 Makarov','9mm Luger','9mm Luger +P','9x21 IMI','9x23 Winchester','.38 Super','.38 ACP','9mm Browning Long','.357 SIG','.38 S&W','.38 S&W Long','.38 Short Colt','.38 Long Colt','.38 Special','.38 SPL +P','.38 SPL +P+','.357 Magnum','.357 Remington Maximum','.256 Winchester Magnum','.40 S&W','10mm Auto','.38-40 Winchester','.400 Cor-Bon','.41 Remington Magnum','.41 Action Express','.44 Special','.44 Magnum','.44-40 Winchester','.44 Russian','.44 Auto Mag','.45 ACP','.45 Auto +P','.45 Auto Rim','.45 GAP','.45 Colt','.454 Casull','.45 Winchester Magnum','.45 Super','.460 S&W Magnum','.475 Linebaugh','.480 Ruger','.50 AE','.500 S&W Magnum','.500 Linebaugh','.50 GI','7.5 FK'];
+// Rifle/Fuzil
+const CAL_RIFLES = ['.17 HMR','.17 WSM','.17 Hornet','.17 Remington','.17 Remington Fireball','.204 Ruger','5mm Remington Magnum','.22 Hornet','.218 Bee','.222 Remington','.223 Remington','5.56x45 NATO','.22-250 Remington','.220 Swift','.225 Winchester','.22 Nosler','.224 Valkyrie','.22 ARC','.22 Creedmoor','.243 Winchester','6mm Remington','6mm Creedmoor','6mm ARC','6mm GT','6mm BR Norma','6mm XC','.240 Weatherby Magnum','.25-20 Winchester','.25-35 Winchester','.250 Savage','.257 Roberts','.25-06 Remington','.257 Weatherby Magnum','25 Creedmoor','6.5 Creedmoor','6.5 Grendel','6.5 PRC','6.5x55 Swedish','.260 Remington','6.5-284 Norma','6.5x47 Lapua','.264 Winchester Magnum','.26 Nosler','6.5-300 Weatherby Magnum','6.5x52 Carcano','.270 Winchester','.270 WSM','.270 Weatherby Magnum','6.8 SPC','6.8 Western','.277 SIG Fury','7mm-08 Remington','7x57 Mauser','.280 Remington','.280 Ackley Improved','.284 Winchester','7mm Remington Magnum','7mm WSM','7mm PRC','7mm Backcountry','7mm Weatherby Magnum','7mm STW','7mm RUM','7x64 Brenneke','28 Nosler','.30 Carbine','.300 Blackout','7.62x39','.30-30 Winchester','.308 Winchester','7.62x51 NATO','.30-06 Springfield','.300 Savage','.30-40 Krag','.300 Winchester Magnum','.300 WSM','.300 PRC','.300 RUM','.300 Weatherby Magnum','.300 H&H Magnum','.300 Norma Magnum','.30 Nosler','7.62x54R','7.5x55 Swiss','7.5x54 French','8x57 Mauser','8mm Remington Magnum','8x68S','.325 WSM','.338 Federal','.338 Winchester Magnum','.338 Lapua Magnum','.338-06','.338 Norma Magnum','.340 Weatherby Magnum','.33 Nosler','8.6 Blackout','.338 ARC','.35 Remington','.350 Legend','.358 Winchester','.35 Whelen','.356 Winchester','.360 Buckhammer','.348 Winchester','9.3x62 Mauser','9.3x74R','9.3x64 Brenneke','.375 H&H Magnum','.375 Ruger','.375 RUM','.376 Steyr','.375 CheyTac','.400 Legend','.405 Winchester','.416 Rigby','.416 Remington Magnum','.416 Ruger','.416 Barrett','.404 Jeffery','.444 Marlin','.45-70 Government','.450 Bushmaster','.450 Marlin','.458 Winchester Magnum','.458 SOCOM','.458 Lott','.460 Weatherby Magnum','.470 Nitro Express','.50 Beowulf','.500 Nitro Express','.505 Gibbs','.577 Nitro Express','.600 Nitro Express','.700 Nitro Express','.50 BMG','5.45x39','5.8x42','.303 British','7.35x51 Carcano','8x56R'];
+// Espingarda
+const CAL_ESPING = ['12','12/70','12/76,2','16','16/70','20','20/70','20/76,2','24','24/65','28','28/70','32','32/63,5','36','36/63,5','36/76,2'];
+const CALIBERS = [...CAL_CURTAS, ...CAL_RIFLES, ...CAL_ESPING];
+const PRIMERS = ['Small Pistol 1½','Large Pistol 2½','Small Pistol Magnum 5½','Small Rifle 7½','Large Rifle 9½','209'];
+const PD = {
+  'Hodgdon':['Titegroup','CFE Pistol','HS-6','Longshot','H110',"Lil'Gun",'H4198','Benchmark','H322','H335','BL-C(2)','CFE 223','CFE BLK','LEVERevolution','Varget','H4895','H4350','H4831SC','H1000','Retumbo','US 869','Superformance'],
+  'IMR':['IMR 4227','IMR 4198','IMR 3031','IMR 4064','IMR 4895','IMR 4350','IMR 4831','IMR 8208 XBR','IMR 7828 SSC'],
+  'Winchester':['231','244','296','WST','WSF','572','748','760','StaBALL 6.5','StaBALL Match','StaBALL HD'],
+  'Accurate':['No. 2','No. 5','No. 7','No. 9','4100','5744','1680','2015','2200','2230','2460','2520','2700','4350','MagPro'],
+  'Ramshot':['Zip','Competition','True Blue','Silhouette','Enforcer','X-Terminator','TAC','Wild Boar','Big Game','Hunter','Magnum','LRT'],
+  'Alliant':['Bullseye','Sport Pistol','BE-86','Power Pistol','Power Pro 300-MP','2400','Unique','Blue Dot','Herco','Red Dot','Green Dot','Clay Dot','e3','Extra-Lite','20/28','410','Pro Reach','Steel','American Select','Promo','AR-Comp','Reloder 7','Reloder 10X','Reloder 15','Reloder 16','Reloder 17','Reloder 19','Reloder 22','Reloder 23','Reloder 25','Reloder 26','Reloder 33','Reloder 50','Power Pro Varmint','Power Pro 2000-MR','Power Pro 4000-MR'],
+  'Vihtavuori':['N310','N320','N330','N340','N350','3N37','3N38','N110','N120','N130','N133','N135','N140','N150','N160','N165','N170','N540','N550','N555','N560','N565','N568','N570','24N41','20N29'],
+  'Reload Swiss':['RS12','RS20','RS24','RS14','RS30','RS36','RS40','RS50','RS52','RS60','RS62','RS70','RS76','RS80'],
+  'Norma':['200','201','202','203-B','204','URP','217','MRP'],
+  'ADI':['APS350','AS30N','APS450','AP50N','AP70N','AP100','APS650','AS50N','AR2205','AR2207','AR2219','Bench Mark 1','Bench Mark 2','Bench Mark 8208','AR2206H','AR2208','AR2209','AR2213SC','AR2217','AR2225','AR2218','Trail Boss'],
+  'Shooters World':['Clean Shot','Auto Pistol','Ultimate Pistol','Major Pistol','Heavy Pistol','Sparta 100','Blackout','Tactical Rifle','AR Plus','Match Rifle','Precision Rifle','Long Rifle','Buffalo Rifle','SW4350','SW50BMG'],
+  'Lovex':['S011','S020','D032','D036','D037.1','D037.2','S030','S035','D013','S040','S053','S060','S062','S065','S070','S071','D060','D063','D073.4','D073.5','D073.6','D100'],
+  'Vectan':['Ba10','Ba9 1/2','Ba9','Ba7 1/2','SP2','Tubal 3000','SP7','Tubal 5000','Tubal 7000','Tubal 8000','SP9','SP11'],
+  'Vectan / Nobel Sport':['A24','AS','A1','A0','206V','206SV','D20','C7','Prima','Prima SV','GM3'],
+  'Maxam':['CSB1','CSB2','CSB3','CSB4','CSB5','CSB6','PSB1','PSB2','PSB3','PSB+','SSB+'],
+  'B&P':['BP 100 Light Pistol','BP 102 Pistol','BP 103 Magnum Pistol','BP 106 Light Rifle','BP 107 Medium Rifle','BP 108 Heavy Rifle','BP 109 Magnum Rifle','F2','MB','M410','M410/2'],
+  'Cheddite':['Aquila','Drago','Granular','JK6','Novecento'],
+  'GOEX':['GOEX Fg','GOEX FFg','GOEX FFFg','GOEX FFFFg','Olde Eynsford'],
+  'Schuetzen':['Schuetzen Reenactor','Schuetzen Cannon','Schuetzen Fg','Schuetzen FFg','Schuetzen FFFg','Schuetzen FFFFg'],
+  'Swiss Black Powder':['Swiss 1Fg','Swiss 1.5Fg','Swiss 2Fg','Swiss 3Fg','Swiss 4Fg'],
+  'CBC':['CBC 102','CBC 124','CBC 126','CBC 128','CBC 129','CBC 207','CBC 209','CBC 210','CBC 212','CBC 215','CBC 216','CBC 217','CBC 218','CBC 219','CBC 220','CBC 221','CBC 222','CBC 231','CBC 236','CBC 244','CBC 246','CBC 250','CBC 266'],
+  'FOX':['FOX CAÇA','FOX PC','FOX TP','FOX TP SPECIAL','FOX TRAP'],
+  'IMBEL':['BD521','BS223','BS308','BS380','BS762','PP 40','PV2P','REX 0900','REX 1200','REX 1624','REX 2836','REX 5100','Tucano','Tucano / PV2P'],
+  'Presidente':['Mantiqueira'],
+  'Thor':['BS Thor','Thor'],
+};
+const PD_FABS = Object.keys(PD).sort((a,b)=>a.localeCompare(b));
+
+/* ── HELPERS ─────────────────────────────────────────────────────────────── */
+const fmt = (n,d=2)=>{const v=parseFloat(n);return(isNaN(v)||!isFinite(v))?'—':v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});};
+const brl = n=>{const v=parseFloat(n);return(isNaN(v)||!isFinite(v))?'—':'R$ '+fmt(v);};
+const rid = ()=>Math.random().toString(36).substr(2,8);
+
+const calc=(c,perda=10)=>{
+  const e  =(parseFloat(c.eP)||0)/(parseFloat(c.eQ)||1)/(parseFloat(c.eV)||1);
+  const esp=(parseFloat(c.espP)||0)/(parseFloat(c.espQ)||1);
+  const p  =((parseFloat(c.polPP)||0)/(parseFloat(c.polGr)||1))*(parseFloat(c.polC)||0);
+  const pr =(parseFloat(c.prjP)||0)/(parseFloat(c.prjQ)||1);
+  const tot=e+esp+p+pr;
+  const totL=tot*(1+(parseFloat(perda)||10)/100);
+  const amU=parseFloat(c.ammoPU)>0?parseFloat(c.ammoPU):null;
+  const eco=amU!==null?amU-totL:null;
+  return{e,esp,p,pr,tot,totL,amU,eco,pct:tot>0?{e:e/tot*100,esp:esp/tot*100,p:p/tot*100,pr:pr/tot*100}:{e:0,esp:0,p:0,pr:0}};
+};
+
+const nc=(o,i)=>({
+  id:rid(), label:`Carga ${i+1}`,
+  eQ:o.eQ,eP:o.eP,eV:o.eV,eTipo:o.eTipo||'',
+  espQ:1000,espP:638.31,espTipo:o.espTipo||'Small Pistol 1½',
+  polGr:15432.4,polPP:598.20,polC:o.polC,polFab:o.polFab||'CBC',polModelo:o.polModelo||'',polLote:'',
+  prjQ:o.prjQ,prjP:o.prjP,prjPeso:o.prjPeso||0,prjTipo:o.prjTipo||'',prjFab:o.prjFab||'Buffalo',
+  ammoQ:o.ammoQ||50,ammoP:o.ammoP||0,ammoPU:o.ammoP&&o.ammoQ?parseFloat((o.ammoP/o.ammoQ).toFixed(4)):0,
+});
+
+const defCarga=(i)=>nc({eQ:500,eP:0,eV:20,espTipo:'Small Pistol 1½',polC:0,polFab:'CBC',polModelo:'',prjQ:1000,prjP:0,ammoQ:50,ammoP:0},i);
+
+const CALS={
+  '.38 SPL':{cat:'Revólver',perda:10,cargas:[
+    nc({eQ:500,eP:1295.77,eV:30,eTipo:'CBC 216',    espTipo:'Small Pistol 1½',polC:3.9,polFab:'CBC',polModelo:'CBC 216',   prjQ:1000,prjP:490, prjPeso:158,prjTipo:'SCV Pintado',ammoQ:50,ammoP:450},0),
+    nc({eQ:500,eP:1295.77,eV:30,eTipo:'imbel Tucano',espTipo:'Small Pistol 1½',polC:4.1,polFab:'IMBEL',polModelo:'Tucano', prjQ:1000,prjP:890, prjPeso:158,prjTipo:'JSP',        ammoQ:50,ammoP:450},1),
+    nc({eQ:500,eP:1295.77,eV:30,eTipo:'CBC 220',    espTipo:'Small Pistol 1½',polC:9.8,polFab:'CBC',polModelo:'CBC 220',   prjQ:1000,prjP:490, prjPeso:158,prjTipo:'SCV Pintado',ammoQ:50,ammoP:450},2),
+  ]},
+  '9mm Luger':{cat:'Pistola',perda:10,cargas:[
+    nc({eQ:500,eP:1416.97,eV:20,eTipo:'CBC 231',   espTipo:'Small Pistol 1½',polC:5.0,polFab:'CBC',polModelo:'CBC 231',    prjQ:1000,prjP:480,prjPeso:125,prjTipo:'Og Pintada',ammoQ:50,ammoP:450},0),
+    nc({eQ:500,eP:1416.97,eV:20,eTipo:'CBC 231',   espTipo:'Small Pistol 1½',polC:5.8,polFab:'CBC',polModelo:'CBC 231',    prjQ:1000,prjP:480,prjPeso:125,prjTipo:'Og Pintada',ammoQ:50,ammoP:450},1),
+    nc({eQ:500,eP:1416.97,eV:20,eTipo:'Imbel 0900',espTipo:'Small Pistol 1½',polC:5.4,polFab:'IMBEL',polModelo:'REX 0900',prjQ:1000,prjP:480,prjPeso:125,prjTipo:'Og Pintada',ammoQ:50,ammoP:450},2),
+  ]},
+  '.380 Auto':{cat:'Pistola',perda:10,cargas:[
+    nc({eQ:500,eP:1295.77,eV:25,eTipo:'CBC 216',espTipo:'Small Pistol 1½',polC:3.2,polFab:'CBC',polModelo:'CBC 216',prjQ:1000,prjP:840, prjPeso:95,prjTipo:'FMC',       ammoQ:50,ammoP:420},0),
+    nc({eQ:500,eP:1295.77,eV:25,eTipo:'CBC 210',espTipo:'Small Pistol 1½',polC:5.4,polFab:'CBC',polModelo:'CBC 210',prjQ:1000,prjP:430, prjPeso:95,prjTipo:'Og Pintada',ammoQ:50,ammoP:420},1),
+  ]},
+  '.40 S&W':{cat:'Pistola',perda:10,cargas:[
+    nc({eQ:500,eP:1685.44,eV:16,eTipo:'CBC 231',   espTipo:'Large Pistol 2½',polC:5.2,polFab:'CBC',polModelo:'CBC 231',   prjQ:1000,prjP:545,prjPeso:180,prjTipo:'CT Pintado',ammoQ:50,ammoP:0},0),
+    nc({eQ:500,eP:1685.44,eV:16,eTipo:'CBC 231',   espTipo:'Large Pistol 2½',polC:6.1,polFab:'CBC',polModelo:'CBC 231',   prjQ:1000,prjP:545,prjPeso:180,prjTipo:'CT Pintado',ammoQ:50,ammoP:0},1),
+    nc({eQ:500,eP:1685.44,eV:16,eTipo:'Imbel PP40',espTipo:'Large Pistol 2½',polC:5.2,polFab:'IMBEL',polModelo:'PP 40',  prjQ:1000,prjP:930,prjPeso:180,prjTipo:'FMC',        ammoQ:50,ammoP:0},2),
+  ]},
+  '.45 ACP':{cat:'Pistola',perda:10,cargas:[
+    nc({eQ:500,eP:1715.28,eV:20,eTipo:'CBC 219',espTipo:'Large Pistol 2½',polC:6.4,polFab:'CBC',polModelo:'CBC 219',prjQ:1000,prjP:655, prjPeso:200,prjTipo:'SCV Pintado',ammoQ:50,ammoP:0},0),
+    nc({eQ:500,eP:1715.28,eV:20,eTipo:'CBC 219',espTipo:'Large Pistol 2½',polC:6.8,polFab:'CBC',polModelo:'CBC 219',prjQ:1000,prjP:655, prjPeso:200,prjTipo:'SCV Pintado',ammoQ:50,ammoP:0},1),
+    nc({eQ:500,eP:1715.28,eV:20,eTipo:'CBC 219',espTipo:'Large Pistol 2½',polC:6.8,polFab:'CBC',polModelo:'CBC 219',prjQ:1000,prjP:960, prjPeso:230,prjTipo:'FMC',        ammoQ:50,ammoP:0},2),
+  ]},
+  '.357 Magnum':{cat:'Revólver',perda:10,cargas:[
+    nc({eQ:500,eP:1528.83,eV:14,eTipo:'CBC 220',espTipo:'Small Pistol 1½',polC:13.0,polFab:'CBC',polModelo:'CBC 220',prjQ:1000,prjP:490, prjPeso:158,prjTipo:'SCV Pintado',ammoQ:50,ammoP:0},0),
+    nc({eQ:500,eP:1528.83,eV:14,eTipo:'CBC 220',espTipo:'Small Pistol 1½',polC:13.0,polFab:'CBC',polModelo:'CBC 220',prjQ:1000,prjP:890, prjPeso:158,prjTipo:'JSP',        ammoQ:50,ammoP:0},1),
+    nc({eQ:500,eP:1528.83,eV:14,eTipo:'CBC 220',espTipo:'Small Pistol 1½',polC:11.8,polFab:'CBC',polModelo:'CBC 220',prjQ:1000,prjP:490, prjPeso:158,prjTipo:'SCV Pintado',ammoQ:50,ammoP:0},2),
+  ]},
+  '.44 Remington Magnum':{cat:'Revólver',perda:10,cargas:[
+    nc({eQ:500,eP:2274.60,eV:14,eTipo:'CBC 220',espTipo:'Large Pistol 2½',polC:18.0,polFab:'CBC',polModelo:'CBC 220',prjQ:1000,prjP:710, prjPeso:230,prjTipo:'SCV Pintado',ammoQ:50,ammoP:0},0),
+    nc({eQ:500,eP:2274.60,eV:14,eTipo:'CBC 220',espTipo:'Large Pistol 2½',polC:18.0,polFab:'CBC',polModelo:'CBC 220',prjQ:1000,prjP:1130,prjPeso:240,prjTipo:'JHP',        ammoQ:50,ammoP:0},1),
+  ]},
+  '.308 Winchester':{cat:'Rifle',perda:10,cargas:[
+    nc({eQ:500,eP:2349.19,eV:18,eTipo:'CBC 102',espTipo:'Large Rifle 9½',polC:41.3,polFab:'CBC',polModelo:'CBC 102',prjQ:500, prjP:1174.96,prjPeso:150,prjTipo:'ETPT',prjFab:'CBC',   ammoQ:20,ammoP:0},0),
+    nc({eQ:500,eP:2349.19,eV:18,eTipo:'CBC 102',espTipo:'Large Rifle 9½',polC:38.2,polFab:'CBC',polModelo:'CBC 102',prjQ:1000,prjP:2215,  prjPeso:168,prjTipo:'JSP', prjFab:'Buffalo',ammoQ:20,ammoP:0},1),
+  ]},
+  '5.56x45':  {cat:'Rifle',perda:10,cargas:[
+    nc({eQ:500,eP:2237.30,eV:14,eTipo:'CBC 102',espTipo:'Small Rifle 7½',polC:24.5,polFab:'CBC',polModelo:'CBC 102',prjQ:500, prjP:652.31,prjPeso:55,prjTipo:'M193',prjFab:'CBC',   ammoQ:20,ammoP:0},0),
+    nc({eQ:500,eP:2237.30,eV:14,eTipo:'CBC 102',espTipo:'Small Rifle 7½',polC:24.1,polFab:'CBC',polModelo:'CBC 102',prjQ:1000,prjP:1780,  prjPeso:55,prjTipo:'JSP', prjFab:'Buffalo',ammoQ:20,ammoP:0},1),
+  ]},
+  '.300 Winchester Mag':{cat:'Rifle',perda:10,cargas:[
+    nc({eQ:100,eP:4042.15,eV:15,eTipo:'CBC 126',espTipo:'Large Rifle 9½',polC:69.5,polFab:'CBC',polModelo:'CBC 126',prjQ:500, prjP:1174.96,prjPeso:150,prjTipo:'ETPT',prjFab:'CBC',   ammoQ:20,ammoP:0},0),
+    nc({eQ:100,eP:4042.15,eV:15,eTipo:'CBC 126',espTipo:'Large Rifle 9½',polC:64.5,polFab:'CBC',polModelo:'CBC 126',prjQ:1000,prjP:2215,  prjPeso:168,prjTipo:'JSP', prjFab:'Buffalo',ammoQ:20,ammoP:0},1),
+  ]},
+};
+
+/* ── ATOMS ───────────────────────────────────────────────────────────────── */
+const LBL=({children})=>(
+  <div style={{fontSize:10,fontFamily:'Barlow Condensed',fontWeight:700,color:C.tx2,letterSpacing:.7,marginBottom:3,textTransform:'uppercase'}}>{children}</div>
+);
+const NI=({label,value,onChange,unit,step='any'})=>(
+  <div>
+    <LBL>{label}</LBL>
+    <div style={{display:'flex',alignItems:'center',gap:4}}>
+      <input className="ale-input" type="number" step={step} value={value} onChange={e=>onChange(e.target.value)} />
+      {unit&&<span style={{fontSize:11,color:C.tx3,fontFamily:'Barlow Condensed',whiteSpace:'nowrap',flexShrink:0}}>{unit}</span>}
+    </div>
+  </div>
+);
+const TI=({label,value,onChange,placeholder})=>(
+  <div>
+    <LBL>{label}</LBL>
+    <input className="ale-input" type="text" value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder||''} />
+  </div>
+);
+const Sel=({label,value,onChange,options,placeholder})=>(
+  <div>
+    {label&&<LBL>{label}</LBL>}
+    <select className="ale-input" value={value} onChange={e=>onChange(e.target.value)}>
+      {placeholder&&<option value="">{placeholder}</option>}
+      {options.map(o=><option key={o} value={o}>{o}</option>)}
+    </select>
+  </div>
+);
+const SC=({icon,title,children,extra})=>(
+  <div style={{background:C.sf,border:`1px solid ${C.bd}`,borderRadius:6,overflow:'hidden',marginBottom:12}}>
+    <div style={{padding:'9px 14px',borderBottom:`1px solid ${C.bds}`,display:'flex',alignItems:'center',gap:7,flexWrap:'wrap'}}>
+      <span style={{fontSize:14}}>{icon}</span>
+      <span style={{fontFamily:'Barlow Condensed',fontSize:13,fontWeight:800,color:C.gold,letterSpacing:2,flex:1,minWidth:120}}>{title}</span>
+      {extra}
+    </div>
+    <div style={{padding:'12px 14px'}}>{children}</div>
+  </div>
+);
+const CostPill=({label,value})=>(
+  <div style={{padding:'7px 10px',background:C.sf3,borderRadius:4,display:'flex',flexDirection:'column',justifyContent:'center'}}>
+    <div style={{fontSize:10,fontFamily:'Barlow Condensed',color:C.tx2,letterSpacing:.7,textTransform:'uppercase',marginBottom:2}}>{label}</div>
+    <div style={{fontFamily:'Barlow Condensed',fontSize:17,fontWeight:800,color:C.gold}}>{brl(value)}</div>
+  </div>
+);
+
+/* ── PDF EXPORT ──────────────────────────────────────────────────────────── */
+const buildPDF=(cal,cargas,idx,results,perda)=>{
+  const c=cargas[idx]||{}, r=results[idx]||{};
+  const polDesc=[c.polFab,c.polModelo,c.polLote].filter(Boolean).join(' · ');
+  const SESS=[50,100,500,1000];
+  const sessRows=SESS.map(n=>`<tr><td>${n}</td><td style="text-align:right">${brl(r.totL*n)}</td><td style="text-align:right">${r.amU?brl(r.amU*n):'—'}</td><td style="text-align:right;color:#1a7f37;font-weight:bold">${r.eco!==null?brl(r.eco*n):'—'}</td></tr>`).join('');
+  const compRows=cargas.map((cr,i)=>{const ri=results[i]||{};return`<tr style="${i===idx?'background:#fffbf0':''}"><td><b>${cr.label}</b></td><td style="text-align:right">${brl(ri.e)}</td><td style="text-align:right">${brl(ri.esp)}</td><td style="text-align:right">${brl(ri.p)}</td><td style="text-align:right">${brl(ri.pr)}</td><td style="text-align:right;font-weight:bold;color:#c8960c">${brl(ri.tot)}</td><td style="text-align:right;font-weight:bold">${brl(ri.totL)}</td><td style="text-align:right">${ri.amU?brl(ri.amU):'—'}</td><td style="text-align:right;color:#1a7f37;font-weight:bold">${ri.eco!==null?brl(ri.eco):'—'}</td></tr>`}).join('');
+  return`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Custo de Recarga — ${cal}</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:20px;color:#111;font-size:12px}h1{font-size:18px;color:#c8960c;margin-bottom:3px}h2{font-size:12px;color:#666;font-weight:normal;margin-bottom:14px}h3{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;color:#333;margin:16px 0 6px;border-top:1px solid #ddd;padding-top:8px}table{width:100%;border-collapse:collapse;margin-bottom:8px}th{padding:5px 8px;background:#f5f5f5;text-align:left;font-size:10px;font-weight:bold;border-bottom:2px solid #ddd}td{padding:5px 8px;border-bottom:1px solid #eee;font-size:11px}.footer{margin-top:18px;font-size:9px;color:#aaa;border-top:1px solid #eee;padding-top:8px}@media print{@page{margin:12mm}}</style>
+</head><body>
+<h1>@ale308win · Custo de Recarga</h1>
+<h2>Calibre: <b>${cal}</b> · Carga: <b>${c.label||'—'}</b> · ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</h2>
+<h3>Composição</h3>
+<table><tr><th>Componente</th><th>Detalhes</th><th style="text-align:right">Custo/cartucho</th></tr>
+<tr><td>Estojo</td><td>${c.eTipo||'—'} · ${c.eQ} un R$${fmt(c.eP)} · vida ${c.eV}x</td><td style="text-align:right">${brl(r.e)}</td></tr>
+<tr><td>Espoleta</td><td>${c.espTipo||'—'} · ${c.espQ} un ${brl(c.espP)}</td><td style="text-align:right">${brl(r.esp)}</td></tr>
+<tr><td>Pólvora</td><td>${polDesc||'—'} · ${c.polC}gr · ${c.polGr}gr/${brl(c.polPP)}</td><td style="text-align:right">${brl(r.p)}</td></tr>
+<tr><td>Projétil</td><td>${c.prjPeso}gr ${c.prjTipo||''} ${c.prjFab||''} · ${c.prjQ} un ${brl(c.prjP)}</td><td style="text-align:right">${brl(r.pr)}</td></tr>
+<tr style="background:#fffbf0"><td colspan="2"><b>TOTAL / cartucho</b></td><td style="text-align:right;font-weight:bold;color:#c8960c;font-size:14px">${brl(r.tot)}</td></tr>
+<tr style="background:#f9f9f9"><td colspan="2"><b>Total + ${perda}% perda</b></td><td style="text-align:right;font-weight:bold;font-size:13px">${brl(r.totL)}</td></tr>
+${r.amU?`<tr><td colspan="2">Munição Nova / cartucho</td><td style="text-align:right">${brl(r.amU)}</td></tr>`:''}
+${r.eco!==null?`<tr style="background:#f0fff4"><td colspan="2"><b>ECONOMIA / cartucho</b></td><td style="text-align:right;font-weight:bold;color:#1a7f37;font-size:14px">${brl(r.eco)}</td></tr>`:''}
+</table>
+${r.eco!==null?`<h3>Economia por Sessão</h3><table><tr><th>Cartuchos</th><th style="text-align:right">Custo Recarga</th><th style="text-align:right">Custo Nova</th><th style="text-align:right">Economia</th></tr>${sessRows}</table>`:''}
+${cargas.length>1?`<h3>Comparativo de Cargas — ${cal}</h3><table><tr><th>Carga</th><th style="text-align:right">Estojo</th><th style="text-align:right">Espoleta</th><th style="text-align:right">Pólvora</th><th style="text-align:right">Projétil</th><th style="text-align:right">Total</th><th style="text-align:right">+${perda}%</th><th style="text-align:right">Nova</th><th style="text-align:right">Economia</th></tr>${compRows}</table>`:''}
+<div class="footer">Gerado por @ale308win · Custo de Recarga · ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')} · Preços sujeitos a variação de mercado.</div>
+</body></html>`;
+};
+
+/* ── LOGIN ───────────────────────────────────────────────────────────────── */
+const Login=({onLogin})=>{
+  const[tab,setTab]=useState('in');
+  const[nome,setNome]=useState('');
+  const[email,setEmail]=useState('');
+  const[senha,setSenha]=useState('');
+  const[err,setErr]=useState('');
+  const[loading,setLoading]=useState(false);
+  const[registered,setRegistered]=useState(false);
+
+  const go=async()=>{
+    if(!email||!senha){setErr('Preencha todos os campos.');return;}
+    if(!email.includes('@')){setErr('E-mail inválido.');return;}
+    if(tab==='up'&&senha.length<8){setErr('Senha mínima: 8 caracteres.');return;}
+    setErr('');setLoading(true);
+    try{
+      if(tab==='in'){
+        const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+        if(error){setErr(error.message.includes('Invalid')||error.message.includes('credentials')?'E-mail ou senha incorretos.':error.message);}
+        else{const u={email:data.user.email,name:data.user.user_metadata?.name||email.split('@')[0]};localStorage.setItem('ale308_user',JSON.stringify(u));onLogin(u);}
+      }else{
+        const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{name:nome||email.split('@')[0]}}});
+        if(error){setErr(error.message);}
+        else if(data.session){const u={email:data.user.email,name:nome||email.split('@')[0]};localStorage.setItem('ale308_user',JSON.stringify(u));onLogin(u);}
+        else{setRegistered(true);}
+      }
+    }catch(e){setErr('Erro: '+e.message);}
+    setLoading(false);
+  };
+  const lbl={fontSize:11,fontFamily:'Barlow Condensed',fontWeight:700,color:C.tx2,letterSpacing:1,marginBottom:4,display:'block'};
+
+  if(registered)return(
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:C.bg,padding:16}}>
+      <div style={{background:'rgba(22,27,34,.98)',border:`1px solid ${C.bd}`,borderRadius:8,padding:28,maxWidth:400,textAlign:'center'}}>
+        <div style={{fontSize:36,marginBottom:12}}>✅</div>
+        <div style={{fontFamily:'Barlow Condensed',fontSize:18,fontWeight:800,color:C.gold,letterSpacing:2,marginBottom:10}}>CONTA CRIADA!</div>
+        <p style={{color:C.tx2,fontSize:13,lineHeight:1.7,marginBottom:16}}>Verifique seu e-mail e clique no link de confirmação.<br/>Depois volte aqui e faça login.</p>
+        <button onClick={()=>{setRegistered(false);setTab('in');}} className="ale-btn" style={{background:C.gold,color:'#0d1117',padding:'10px 24px',fontSize:13,width:'100%'}}>FAZER LOGIN</button>
+      </div>
+    </div>
+  );
+
+  return(
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#0d1117',position:'relative',overflow:'hidden'}}>
+      <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse at 50% 0%,rgba(212,165,32,.15),transparent 60%)'}}/>
+      <div style={{position:'relative',zIndex:1,width:'100%',maxWidth:420,padding:'0 16px',textAlign:'center'}}>
+        <div style={{marginBottom:24}}>
+          <div style={{fontSize:48,marginBottom:8,filter:'drop-shadow(0 0 24px rgba(212,165,32,.5))'}}>🎯</div>
+          <div style={{fontFamily:'Barlow Condensed',fontSize:22,fontWeight:800,color:C.gold,letterSpacing:4}}>ÁREA DO ATIRADOR · @ALE308WIN</div>
+          <div style={{fontFamily:'Barlow Condensed',fontSize:12,color:C.tx2,letterSpacing:3,marginTop:4}}>ÁREA DO ATIRADOR</div>
+        </div>
+        <div style={{background:'rgba(22,27,34,.98)',border:`1px solid ${C.bd}`,borderRadius:8,overflow:'hidden'}}>
+          <div style={{display:'flex',borderBottom:`1px solid ${C.bd}`}}>
+            {[['in','ENTRAR'],['up','CRIAR CONTA']].map(([t,l])=>(
+              <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:13,background:'none',border:'none',borderBottom:`2px solid ${tab===t?C.gold:'transparent'}`,color:tab===t?C.gold:C.tx2,fontFamily:'Barlow Condensed',fontSize:13,fontWeight:700,letterSpacing:2,cursor:'pointer',transition:'all .15s'}}>{l}</button>
+            ))}
+          </div>
+          <div style={{padding:22}}>
+            {tab==='up'&&<div style={{marginBottom:11}}><label style={lbl}>NOME</label><input className="ale-input" value={nome} onChange={e=>setNome(e.target.value)} placeholder="Seu nome" /></div>}
+            <div style={{marginBottom:11}}><label style={lbl}>E-MAIL</label><input className="ale-input" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="seu@email.com" /></div>
+            <div style={{marginBottom:18}}><label style={lbl}>SENHA</label><input className="ale-input" type="password" value={senha} onChange={e=>setSenha(e.target.value)} placeholder={tab==='in'?'••••••••':'mín. 8 caracteres'} onKeyDown={e=>e.key==='Enter'&&go()} /></div>
+            {err&&<div style={{color:'#f85149',fontSize:12,marginBottom:11}}>{err}</div>}
+            <button onClick={go} disabled={loading} className="ale-btn" style={{width:'100%',padding:'12px',background:loading?C.sf3:C.gold,color:loading?C.tx2:'#0d1117',fontSize:15,letterSpacing:2,cursor:loading?'not-allowed':'pointer'}}>
+              {loading?'AGUARDE...':(tab==='in'?'ENTRAR':'CRIAR CONTA')}
+            </button>
+            <div style={{marginTop:10,color:C.tx3,fontSize:11}}>Login unificado · Cronógrafo + Área do Atirador</div>
+          </div>
+        </div>
+        <div style={{marginTop:16,display:'flex',alignItems:'center',justifyContent:'center',gap:12,flexWrap:'wrap'}}>
+          <span style={{color:C.tx3,fontSize:11}}>Material de apoio ao curso de recarga</span>
+          <IgLink/>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+/* ── HUB ─────────────────────────────────────────────────────────────────── */
+const IgLink=()=>(
+  <a href="https://instagram.com/ale308win" target="_blank" rel="noopener"
+    style={{display:'inline-flex',alignItems:'center',gap:5,color:C.gold,textDecoration:'none',fontFamily:'Barlow Condensed',fontSize:12,fontWeight:700,letterSpacing:1,opacity:.85,transition:'opacity .15s'}}
+    onMouseEnter={e=>e.currentTarget.style.opacity=1} onMouseLeave={e=>e.currentTarget.style.opacity=.85}>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
+    </svg>
+    @ale308win
+  </a>
+);
+
+const Hub=({user,onSelect,onLogout})=>{
+  // SSO automático: Supabase persiste sessão no localStorage compartilhado (mesmo domínio ale308win.github.io)
+  const openExternal=(url)=>{ window.location.href=url; };
+
+  const tools=[
+    {id:'recargas', icon:'📚', name:'BASE DE RECARGA',   desc:'Tabelas e receitas de recarga',      sub:'Dados técnicos por calibre',           active:true, ext:'https://ale308win.github.io/recargas/', direct:true},
+    {id:'cronografo',icon:'🎯',name:'CRONÓGRAFO',        desc:'Registro & Análise Balística',        sub:'AVG · SD · ES · FPS · Joules',         active:true, ext:'https://ale308win.github.io/cronografo/', direct:true},
+    {id:'custos',   icon:'💰', name:'CUSTO DE RECARGA',  desc:'Calcule seus custos por calibre',     sub:'Comparativo vs munição nova',          active:true},
+    {id:'traj',     icon:'📐', name:'BDC / TRAJETÓRIA',  desc:'Compensação de queda balística',      sub:'Drop · Energia · Vento · Parábola',    active:true, ext:'trajetoria.html', direct:true},
+
+  ];
+
+  return(
+    <div style={{minHeight:'100vh',background:C.bg,display:'flex',flexDirection:'column'}}>
+      {/* Nav */}
+      <div style={{background:C.sf,borderBottom:`1px solid ${C.bd}`,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 20px',height:56,position:'sticky',top:0,zIndex:10,flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <span style={{fontSize:22}}>🎯</span>
+          <span style={{fontFamily:'Barlow Condensed',fontSize:20,fontWeight:800,color:C.gold,letterSpacing:3}}>ALE308WIN</span>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:14}}>
+          <IgLink/>
+          <span style={{color:C.tx3,fontSize:11}} className="hide-sm">|</span>
+          <span style={{color:C.tx2,fontSize:12,fontFamily:'Barlow Condensed'}} className="hide-sm">{user?.name}</span>
+          <button onClick={onLogout} className="ale-btn" style={{background:'none',border:`1px solid ${C.bd}`,color:C.tx2,padding:'5px 12px',fontSize:12}}>SAIR</button>
+        </div>
+      </div>
+
+      <div style={{padding:'28px 20px',maxWidth:1000,margin:'0 auto',width:'100%',flex:1}}>
+
+        {/* Welcome */}
+        <div style={{marginBottom:28}}>
+          <h1 style={{fontFamily:'Barlow Condensed',fontSize:28,fontWeight:800,letterSpacing:1,marginBottom:5}}>Área do Atirador</h1>
+          <p style={{color:C.tx2,fontSize:14}}>Bem-vindo, <b style={{color:C.tx}}>{user?.name}</b>. Selecione uma ferramenta abaixo.</p>
+        </div>
+
+        {/* Tools Grid */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(210px,1fr))',gap:14,marginBottom:28}}>
+          {tools.map(t=>(
+            <div key={t.id} style={{background:C.sf,border:`1px solid ${t.active?C.bd:C.bds}`,borderRadius:8,padding:20,display:'flex',flexDirection:'column',gap:8,opacity:t.active?1:.45,position:'relative',overflow:'hidden'}}>
+              {t.id==='recargas'&&<div style={{position:'absolute',top:0,left:0,right:0,height:2,background:C.gold}}/>}
+              <span style={{fontSize:28}}>{t.icon}</span>
+              <div style={{fontFamily:'Barlow Condensed',fontSize:13,fontWeight:800,color:C.gold,letterSpacing:2}}>{t.name}</div>
+              <div style={{color:C.tx,fontSize:13,lineHeight:1.4}}>{t.desc}</div>
+              <div style={{color:C.tx2,fontSize:11,flexGrow:1,fontFamily:'Barlow Condensed',letterSpacing:.5}}>{t.sub}</div>
+              {t.active
+                ? t.direct
+                  ? <button onClick={()=>openExternal(t.ext)} className="ale-btn"
+                      style={{background:t.id==='recargas'?C.gold:C.sf3,color:t.id==='recargas'?'#0d1117':C.tx,border:`1px solid ${C.bd}`,padding:'7px 14px',fontSize:12,alignSelf:'flex-start',cursor:'pointer'}}>
+                      ABRIR →
+                    </button>
+                  : <button onClick={()=>onSelect(t.id)} className="ale-btn"
+                      style={{background:C.gold,color:'#0d1117',padding:'7px 14px',fontSize:12,alignSelf:'flex-start'}}>
+                      ABRIR →
+                    </button>
+                : <span style={{color:C.tx3,fontFamily:'Barlow Condensed',fontSize:11,letterSpacing:1}}>EM BREVE</span>
+              }
+            </div>
+          ))}
+        </div>
+
+        {/* Sobre + Vídeo */}
+        <div style={{background:C.sf,border:`1px solid ${C.bd}`,borderRadius:8,marginBottom:20,overflow:'hidden'}}>
+          <div style={{padding:'12px 18px',borderBottom:`1px solid ${C.bds}`,display:'flex',alignItems:'center',gap:8}}>
+            <span style={{fontSize:16}}>🎯</span>
+            <span style={{fontFamily:'Barlow Condensed',fontSize:14,fontWeight:800,color:C.gold,letterSpacing:2}}>SOBRE · @ALE308WIN</span>
+          </div>
+          <div style={{padding:20,display:'flex',gap:20,flexWrap:'wrap'}}>
+            {/* Foto */}
+            <div style={{flex:'0 0 auto'}}>
+              <img src="assets/foto_ale308win.png" alt="@ale308win" style={{width:110,height:148,objectFit:'cover',borderRadius:6,border:`1px solid ${C.bd}`,display:'block'}}/>
+            </div>
+            {/* Bio */}
+            <div style={{flex:1,minWidth:200}}>
+              <div style={{fontFamily:'Barlow Condensed',fontSize:18,fontWeight:800,color:C.gold,letterSpacing:1,marginBottom:8}}>@ale308win</div>
+              <p style={{color:C.tx2,fontSize:13,lineHeight:1.7,marginBottom:10}}>
+                Brasileiro, IAT, atirador desportivo, caçador e colecionador registrado junto ao SFPC/2, com mais de <b style={{color:C.tx}}>28 anos de experiência</b> no tiro esportivo, caça e estudo e prática em recarga de munições para armas curtas e longas no Brasil e exterior.
+              </p>
+              <ul style={{color:C.tx3,fontSize:12,lineHeight:2,listStyle:'none',padding:0,marginBottom:10}}>
+                {['Lymann Reloading for Handgunners','Hornady Reloading','Recarga de Munições – Roberto Pimentel','Clínicas de Recarga Buffalo (2010 a 2024)','Ex diretor de provas da ABAR','Ex membro do conselho diretivo ABAR'].map(item=>(
+                  <li key={item} style={{display:'flex',gap:6,alignItems:'flex-start'}}><span style={{color:C.gold,marginTop:2}}>›</span>{item}</li>
+                ))}
+              </ul>
+              <IgLink/>
+            </div>
+          </div>
+          {/* ABAR logo */}
+          <div style={{padding:'0 20px 16px',display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}}>
+            <img src="assets/logo_abar.png" alt="ABAR" style={{height:52,objectFit:'contain'}}/>
+            <span style={{color:C.tx3,fontSize:11,fontFamily:'Barlow Condensed',letterSpacing:1}}>ASSOCIAÇÃO BRASILEIRA DE ATIRADORES DE RIFLE</span>
+          </div>
+          {/* Vídeo */}
+          <div style={{padding:'0 20px 20px'}}>
+            <div style={{fontFamily:'Barlow Condensed',fontSize:12,fontWeight:700,color:C.tx3,letterSpacing:2,marginBottom:10}}>APRESENTAÇÃO EM VÍDEO</div>
+            <div style={{display:'flex',gap:16,alignItems:'flex-start',flexWrap:'wrap'}}>
+              <div style={{flex:'0 0 auto',width:180,height:320,borderRadius:6,overflow:'hidden',border:`1px solid ${C.bd}`,background:'#000'}}>
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/WhUKTTZUcB4?rel=0&amp;modestbranding=1"
+                  title="@ale308win"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  style={{width:'100%',height:'100%',border:'none',display:'block'}}
+                />
+              </div>
+              <div style={{flex:1,minWidth:160,paddingTop:4}}>
+                <p style={{color:C.tx2,fontSize:12,lineHeight:1.8}}>Conheça o trabalho de mais de 28 anos dedicados ao tiro esportivo e à recarga técnica de munições.</p>
+                <a href="https://www.youtube.com/shorts/WhUKTTZUcB4" target="_blank" rel="noopener"
+                  style={{display:'inline-block',marginTop:10,color:C.gold,fontFamily:'Barlow Condensed',fontSize:12,letterSpacing:1,textDecoration:'none'}}>
+                  ▶ Ver no YouTube
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Storage info */}
+        <div style={{padding:'10px 14px',background:C.sf,border:`1px solid ${C.bd}`,borderRadius:6,display:'flex',gap:8,alignItems:'center'}}>
+          <span style={{fontSize:13}}>💾</span>
+          <span style={{fontSize:12,color:C.tx2}}>Dados salvos localmente neste navegador. Sincronização em nuvem em breve.</span>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{borderTop:`1px solid ${C.bds}`,padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8}}>
+        <span style={{fontFamily:'Barlow Condensed',fontSize:11,color:C.tx3,letterSpacing:1}}>© ALE308WIN · ÁREA DO ATIRADOR</span>
+        <IgLink/>
+      </div>
+    </div>
+  );
+};
+
+/* ── CUSTO DE RECARGA ────────────────────────────────────────────────────── */
+const Custo=({user,onBack})=>{
+  const[cal,setCal]=useState(()=>{try{return localStorage.getItem('ale308_cal')||'.38 SPL';}catch{return'.38 SPL';}});
+  const[showCustom,setShowCustom]=useState(false);
+  const[customCalInput,setCustomCalInput]=useState('');
+  const[idx,setIdx]=useState(0);
+
+  const[data,setData]=useState(()=>{
+    try{
+      const s=localStorage.getItem('ale308_custos');
+      if(s){
+        const p=JSON.parse(s);
+        // migrate old polTipo → polFab/polModelo
+        for(const k of Object.keys(p)){
+          if(p[k].cargas){
+            p[k].cargas=p[k].cargas.map(c=>{
+              if(c.ammoPU===undefined){c.ammoPU=c.ammoP&&c.ammoQ?parseFloat((c.ammoP/c.ammoQ).toFixed(4)):0;}
+              if(c.polFab===undefined&&c.polTipo!==undefined){
+                const t=c.polTipo||'';
+                const fab=t.startsWith('CBC')?'CBC':t.toLowerCase().includes('imbel')?'IMBEL':'';
+                return{...c,polFab:fab,polModelo:t,polLote:''};
+              }
+              return c;
+            });
+          }
+          if(p[k].perda===undefined) p[k].perda=10;
+        }
+        return p;
+      }
+    }catch{}
+    return CALS;
+  });
+
+  useEffect(()=>{localStorage.setItem('ale308_custos',JSON.stringify(data));},[data]);
+  useEffect(()=>{localStorage.setItem('ale308_cal',cal);},[cal]);
+  useEffect(()=>setIdx(0),[cal]);
+
+  const calData=data[cal]||{cat:'',perda:10,cargas:[]};
+  const cargas=calData.cargas||[];
+  const perda=calData.perda??10;
+  const carga=cargas[idx]||cargas[0]||{};
+
+  const setPerda=v=>setData(prev=>({...prev,[cal]:{...prev[cal],perda:parseInt(v)}}));
+  const set=(k,v)=>setData(prev=>{const c=[...prev[cal].cargas];c[idx]={...c[idx],[k]:v};return{...prev,[cal]:{...prev[cal],cargas:c}};});
+  const setFields=obj=>setData(prev=>{const c=[...prev[cal].cargas];c[idx]={...c[idx],...obj};return{...prev,[cal]:{...prev[cal],cargas:c}};});
+
+  const handlePolFab=v=>{const mods=PD[v]||[];setFields({polFab:v,polModelo:mods.includes(carga.polModelo)?carga.polModelo:(mods[0]||'')});};
+  const polModelos=carga.polFab&&PD[carga.polFab]?PD[carga.polFab]:[];
+
+  const selectCal=v=>{
+    if(v==='__outro__'){setShowCustom(true);return;}
+    setShowCustom(false);
+    if(!data[v]){setData(prev=>({...prev,[v]:{cat:'',perda:10,cargas:[defCarga(0)]}}));}
+    setCal(v);
+  };
+  const addCustomCal=()=>{
+    const n=customCalInput.trim();if(!n)return;
+    if(!data[n]){setData(prev=>({...prev,[n]:{cat:'',perda:10,cargas:[defCarga(0)]}}));}
+    setCal(n);setShowCustom(false);setCustomCalInput('');
+  };
+
+  const addCarga=()=>{const base={...carga,id:rid(),label:`Carga ${cargas.length+1}`};setData(prev=>{const c=[...prev[cal].cargas,base];return{...prev,[cal]:{...prev[cal],cargas:c}};});setIdx(cargas.length);};
+  const delCarga=()=>{if(cargas.length<=1)return;setData(prev=>{const c=prev[cal].cargas.filter((_,i)=>i!==idx);return{...prev,[cal]:{...prev[cal],cargas:c}};});setIdx(Math.max(0,idx-1));};
+
+  const results=useMemo(()=>cargas.map(c=>calc(c,perda)),[JSON.stringify(cargas),perda]);
+  const res=results[idx]||{};
+  const SESS=[50,100,500,1000];
+
+  const exportPDF=()=>{
+    const html=buildPDF(cal,cargas,idx,results,perda);
+    try{
+      const blob=new Blob([html],{type:'text/html'});
+      const url=URL.createObjectURL(blob);
+      const win=window.open(url,'_blank');
+      if(!win){alert('Ative popups para exportar o PDF.\n\nOu: tente novamente após permitir popups para esta página.');return;}
+      setTimeout(()=>win.print(),600);
+    }catch(e){alert('Erro ao gerar PDF: '+e.message);}
+  };
+
+  const TR=({label,vals,bold,gold,green})=>(
+    <tr style={{borderBottom:`1px solid ${C.bds}`}}>
+      <td style={{padding:'7px 10px',fontSize:12,fontFamily:'Barlow Condensed',fontWeight:bold?700:400,color:gold?C.gold:green?C.greenTx:C.tx2,background:C.sf,whiteSpace:'nowrap'}}>{label}</td>
+      {vals.map((v,i)=>(
+        <td key={i} style={{padding:'7px 10px',textAlign:'right',fontFamily:'Barlow Condensed',fontSize:bold?15:13,fontWeight:bold?800:500,color:gold?C.gold:green?C.greenTx:C.tx,background:i===idx?C.sf2:C.sf}}>{v}</td>
+      ))}
+    </tr>
+  );
+
+  const builtinCals=CALIBERS;
+  const customCals=Object.keys(data).filter(k=>!builtinCals.includes(k));
+
+  return(
+    <div style={{minHeight:'100vh',background:C.bg,paddingBottom:60}}>
+      {/* Nav */}
+      <div style={{background:C.sf,borderBottom:`1px solid ${C.bd}`,display:'flex',alignItems:'center',gap:8,padding:'0 12px',height:54,position:'sticky',top:0,zIndex:10}}>
+        <span style={{fontSize:18}}>🎯</span>
+        <span style={{fontFamily:'Barlow Condensed',fontSize:17,fontWeight:800,color:C.gold,letterSpacing:2,marginRight:4}}>CUSTO DE RECARGA</span>
+        <div style={{flex:1}}/>
+        <button onClick={exportPDF} className="ale-btn" style={{background:C.sf3,color:C.greenTx,border:`1px solid ${C.bd}`,padding:'5px 12px',fontSize:11,display:'flex',alignItems:'center',gap:4}}>
+          ⬇ PDF
+        </button>
+        <button onClick={onBack} className="ale-btn" style={{background:C.sf2,color:C.tx2,border:`1px solid ${C.bd}`,padding:'5px 12px',fontSize:11}}>← HUB</button>
+        <IgLink/>
+      </div>
+
+      {/* Caliber Row */}
+      <div style={{background:C.sf,borderBottom:`1px solid ${C.bds}`,padding:'10px 14px'}}>
+        <div style={{maxWidth:1360,margin:'0 auto',display:'flex',gap:10,alignItems:'flex-end',flexWrap:'wrap'}}>
+          <div style={{flex:'1 1 200px',minWidth:160}}>
+            <LBL>Calibre</LBL>
+            <select className="ale-input" value={builtinCals.includes(cal)||customCals.includes(cal)?cal:''} onChange={e=>selectCal(e.target.value)}>
+              <optgroup label="Calibres Padrão">
+                {builtinCals.map(c=><option key={c} value={c}>{c}</option>)}
+              </optgroup>
+              {customCals.length>0&&<optgroup label="Meus Calibres">{customCals.map(c=><option key={c} value={c}>⚡ {c}</option>)}</optgroup>}
+              <option value="__outro__">— Adicionar novo calibre —</option>
+            </select>
+          </div>
+          {showCustom&&(
+            <>
+              <div style={{flex:'1 1 160px',minWidth:130}}>
+                <LBL>Nome do calibre</LBL>
+                <input className="ale-input" value={customCalInput} onChange={e=>setCustomCalInput(e.target.value)} placeholder="Ex: .357 SIG" onKeyDown={e=>e.key==='Enter'&&addCustomCal()} />
+              </div>
+              <button onClick={addCustomCal} className="ale-btn" style={{background:C.gold,color:'#0d1117',padding:'8px 14px',fontSize:12,height:38,flexShrink:0}}>ADICIONAR</button>
+              <button onClick={()=>{setShowCustom(false);setCustomCalInput('');}} className="ale-btn" style={{background:C.sf3,color:C.tx2,border:`1px solid ${C.bd}`,padding:'8px 10px',fontSize:12,height:38,flexShrink:0}}>✕</button>
+            </>
+          )}
+          {/* Load tabs */}
+          <div style={{display:'flex',gap:6,alignItems:'flex-end',flexWrap:'wrap'}}>
+            {cargas.map((c,i)=>(
+              <button key={c.id} onClick={()=>setIdx(i)} className={`load-tab${idx===i?' on':''}`}>{c.label}</button>
+            ))}
+            <button onClick={addCarga} className="ale-btn" style={{background:C.gold,color:'#0d1117',padding:'6px 12px',fontSize:11,height:32}}>+ CARGA</button>
+            {cargas.length>1&&<button onClick={delCarga} className="ale-btn" style={{background:C.red,color:'#fff',padding:'6px 9px',fontSize:11,height:32}}>✕</button>}
+          </div>
+        </div>
+      </div>
+
+      {/* Main 2-col */}
+      <div className="two-col" style={{padding:'14px',maxWidth:1360,margin:'0 auto'}}>
+
+        {/* ── LEFT: Inputs ── */}
+        <div style={{minWidth:0}}>
+
+          {/* ESTOJO */}
+          <SC icon="🔩" title="Estojo">
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:9,marginBottom:9}}>
+              <NI label="Qtd no lote"   value={carga.eQ}  onChange={v=>set('eQ',v)}  step="1" />
+              <NI label="Valor R$"      value={carga.eP}  onChange={v=>set('eP',v)} />
+              <NI label="Vida útil"     value={carga.eV}  onChange={v=>set('eV',v)}  step="1" unit="recargas" />
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}}>
+              <TI label="Tipo / Lote"   value={carga.eTipo||''} onChange={v=>set('eTipo',v)} />
+              <CostPill label="Custo / cartucho" value={res.e} />
+            </div>
+          </SC>
+
+          {/* ESPOLETA */}
+          <SC icon="💥" title="Espoleta">
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9,marginBottom:9}}>
+              <Sel label="Tipo" value={carga.espTipo||''} onChange={v=>set('espTipo',v)} options={PRIMERS} placeholder="Selecione..." />
+              <CostPill label="Custo / cartucho" value={res.esp} />
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}}>
+              <NI label="Qtd no lote"   value={carga.espQ} onChange={v=>set('espQ',v)} step="1" />
+              <NI label="Valor R$"      value={carga.espP} onChange={v=>set('espP',v)} />
+            </div>
+          </SC>
+
+          {/* PÓLVORA */}
+          <SC icon="💨" title="Pólvora">
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9,marginBottom:9}}>
+              <Sel label="Fabricante" value={carga.polFab||''} onChange={handlePolFab} options={PD_FABS} placeholder="Selecione..." />
+              <Sel label="Modelo" value={carga.polModelo||''} onChange={v=>set('polModelo',v)} options={polModelos} placeholder={polModelos.length===0?'Selecione fabricante...':'Selecione...'} />
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9,marginBottom:9}}>
+              <TI label="Lote" value={carga.polLote||''} onChange={v=>set('polLote',v)} placeholder="Nº do lote" />
+              <NI label="Carga gr/cartucho" value={carga.polC} onChange={v=>set('polC',v)} />
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:9}}>
+              <NI label="Peso emb. (grains)" value={carga.polGr}  onChange={v=>set('polGr',v)} />
+              <NI label="Valor emb. R$"      value={carga.polPP}  onChange={v=>set('polPP',v)} />
+              <CostPill label="Custo / cartucho" value={res.p} />
+            </div>
+          </SC>
+
+          {/* PROJÉTIL */}
+          <SC icon="🎯" title="Projétil">
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9,marginBottom:9}}>
+              <NI label="Qtd no lote" value={carga.prjQ}   onChange={v=>set('prjQ',v)}   step="1" />
+              <NI label="Valor R$"    value={carga.prjP}   onChange={v=>set('prjP',v)} />
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:9,marginBottom:9}}>
+              <NI label="Peso (gr)"   value={carga.prjPeso} onChange={v=>set('prjPeso',v)} step="1" unit="gr" />
+              <TI label="Tipo"        value={carga.prjTipo||''} onChange={v=>set('prjTipo',v)} />
+              <TI label="Fabricante"  value={carga.prjFab||''}  onChange={v=>set('prjFab',v)} />
+              <CostPill label="Custo / cartucho" value={res.pr} />
+            </div>
+          </SC>
+
+          {/* MUNIÇÃO NOVA */}
+          <SC icon="🏪" title="Munição Nova (Referência)">
+            <NI label="Preço da munição nova (por cartucho)" value={carga.ammoPU||''} onChange={v=>set('ammoPU',v)} unit="R$" />
+          </SC>
+        </div>
+
+        {/* ── RIGHT: Results ── */}
+        <div style={{minWidth:0}}>
+
+          {/* Composição */}
+          <SC icon="📊" title="Composição dos Custos" extra={
+            <div style={{display:'flex',alignItems:'center',gap:6}}>
+              <span style={{fontFamily:'Barlow Condensed',fontSize:11,color:C.tx2,letterSpacing:.7}}>PERDA</span>
+              <select className="ale-input" value={perda} onChange={e=>setPerda(e.target.value)}
+                style={{width:64,padding:'3px 8px',fontSize:13,fontFamily:'Barlow Condensed',fontWeight:700}}>
+                {Array.from({length:15},(_,i)=>i+1).map(n=><option key={n} value={n}>{n}%</option>)}
+              </select>
+            </div>
+          }>
+            {[{label:'Estojo',v:res.pct?.e||0,cost:res.e,color:'#3b82f6'},{label:'Espoleta',v:res.pct?.esp||0,cost:res.esp,color:'#8b5cf6'},{label:'Pólvora',v:res.pct?.p||0,cost:res.p,color:'#f97316'},{label:'Projétil',v:res.pct?.pr||0,cost:res.pr,color:'#22c55e'}].map(item=>(
+              <div key={item.label} style={{marginBottom:9}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:3}}>
+                  <span style={{fontSize:12,fontFamily:'Barlow Condensed',color:C.tx2}}>{item.label}</span>
+                  <span style={{fontSize:12,fontFamily:'Barlow Condensed',display:'flex',gap:10}}>
+                    <span style={{color:C.tx2}}>{fmt(item.v,1)}%</span>
+                    <span style={{color:C.gold}}>{brl(item.cost)}</span>
+                  </span>
+                </div>
+                <div style={{height:5,background:C.sf3,borderRadius:3,overflow:'hidden'}}>
+                  <div style={{width:`${Math.min(item.v,100)}%`,height:'100%',background:item.color,borderRadius:3,transition:'width .3s'}}/>
+                </div>
+              </div>
+            ))}
+            <div style={{marginTop:12,padding:'9px 12px',background:C.sf3,borderRadius:4,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontFamily:'Barlow Condensed',fontSize:12,color:C.tx2,fontWeight:700,letterSpacing:1}}>TOTAL / CARTUCHO</span>
+              <span style={{fontFamily:'Barlow Condensed',fontSize:22,fontWeight:800,color:C.gold}}>{brl(res.tot)}</span>
+            </div>
+            <div style={{marginTop:6,padding:'9px 12px',background:C.sf3,borderRadius:4,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontFamily:'Barlow Condensed',fontSize:12,color:C.tx2,fontWeight:700,letterSpacing:1}}>TOTAL +{perda}% PERDA</span>
+              <span style={{fontFamily:'Barlow Condensed',fontSize:20,fontWeight:800,color:C.tx}}>{brl(res.totL)}</span>
+            </div>
+            <div style={{marginTop:8,display:'flex',gap:6}}>
+              <button onClick={exportPDF} className="ale-btn" style={{flex:1,padding:'9px',background:'none',border:`1px solid ${C.bd}`,color:C.greenTx,fontSize:13,letterSpacing:1}}>⬇ EXPORTAR PDF</button>
+            </div>
+          </SC>
+
+          {/* Comparativo */}
+          <SC icon="📋" title="Comparativo de Cargas">
+            <div style={{overflowX:'auto'}}>
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{borderBottom:`1px solid ${C.bd}`}}>
+                    <th style={{padding:'6px 10px',textAlign:'left',fontFamily:'Barlow Condensed',fontSize:11,color:C.tx2,fontWeight:700,background:C.sf}}>MÉTRICA</th>
+                    {cargas.map((c,i)=>(
+                      <th key={c.id} style={{padding:'6px 10px',textAlign:'right',fontFamily:'Barlow Condensed',fontSize:11,fontWeight:800,color:i===idx?C.gold:C.tx2,background:i===idx?C.sf2:C.sf,letterSpacing:.8}}>{c.label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <TR label="Custo Estojo"       vals={results.map(r=>brl(r.e))} />
+                  <TR label="Custo Espoleta"     vals={results.map(r=>brl(r.esp))} />
+                  <TR label="Custo Pólvora"      vals={results.map(r=>brl(r.p))} />
+                  <TR label="Custo Projétil"     vals={results.map(r=>brl(r.pr))} />
+                  <TR label="TOTAL / cartucho"   vals={results.map(r=>brl(r.tot))}  bold gold />
+                  <TR label={`Total +${perda}% perda`} vals={results.map(r=>brl(r.totL))} bold />
+                  <TR label="Munição Nova"        vals={results.map(r=>r.amU?brl(r.amU):'—')} />
+                  <TR label="ECONOMIA / cartucho" vals={results.map(r=>r.eco!==null?brl(r.eco):'—')} bold green />
+                </tbody>
+              </table>
+            </div>
+          </SC>
+
+          {/* Economia por sessão */}
+          {res.eco!==null&&res.eco>0&&(
+            <SC icon="💸" title="Economia por Sessão">
+              <div style={{overflowX:'auto'}}>
+                <table style={{width:'100%',borderCollapse:'collapse'}}>
+                  <thead>
+                    <tr style={{borderBottom:`1px solid ${C.bd}`}}>
+                      {['Cartuchos','Custo Recarga','Custo Nova','Economia'].map((h,i)=>(
+                        <th key={h} style={{padding:'5px 10px',textAlign:i===0?'left':'right',fontFamily:'Barlow Condensed',fontSize:10,fontWeight:700,color:i===3?C.greenTx:C.tx2,background:C.sf,letterSpacing:.7}}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {SESS.map(n=>(
+                      <tr key={n} style={{borderBottom:`1px solid ${C.bds}`}}>
+                        <td style={{padding:'6px 10px',fontFamily:'Barlow Condensed',fontWeight:700,color:C.tx,background:C.sf,fontSize:13}}>{n}</td>
+                        <td style={{padding:'6px 10px',textAlign:'right',fontFamily:'Barlow Condensed',color:C.tx2,background:C.sf,fontSize:12}}>{brl(res.totL*n)}</td>
+                        <td style={{padding:'6px 10px',textAlign:'right',fontFamily:'Barlow Condensed',color:C.tx2,background:C.sf,fontSize:12}}>{res.amU?brl(res.amU*n):'—'}</td>
+                        <td style={{padding:'6px 10px',textAlign:'right',background:C.sf}}>
+                          <span style={{fontFamily:'Barlow Condensed',fontSize:14,fontWeight:800,color:C.greenTx}}>{brl(res.eco*n)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </SC>
+          )}
+
+          {/* Notas */}
+          <SC icon="ℹ️" title="Notas de Cálculo">
+            <div style={{fontSize:12,color:C.tx2,lineHeight:1.9}}>
+              <p>• <b style={{color:C.tx}}>Perda ajustável</b>: use o seletor "PERDA" acima (1–15%). Padrão: {perda}%.</p>
+              <p>• <b style={{color:C.tx}}>Pólvora</b>: calculada em grains. 1 kg = 15.432 gr.</p>
+              <p>• <b style={{color:C.tx}}>Estojo</b>: custo diluído pela vida útil (nº de recargas).</p>
+              <p>• <b style={{color:C.tx}}>Dados salvos</b>: localmente neste navegador, por calibre.</p>
+              <p>• Preços pré-carregados da planilha @ale308win — atualize com seus preços reais.</p>
+            </div>
+          </SC>
+        </div>
+      </div>
+
+      {/* Mobile back button */}
+      <div className="hide-lg" style={{position:'fixed',bottom:16,left:16,zIndex:99,display:'flex',gap:8}}>
+        <button onClick={onBack} className="ale-btn" style={{background:C.sf2,color:C.tx2,border:`1px solid ${C.bd}`,padding:'10px 18px',fontSize:13}}>← HUB</button>
+        <button onClick={exportPDF} className="ale-btn" style={{background:C.sf3,color:C.greenTx,border:`1px solid ${C.bd}`,padding:'10px 14px',fontSize:13}}>⬇ PDF</button>
+      </div>
+    </div>
+  );
+};
+
+/* ── APP ─────────────────────────────────────────────────────────────────── */
+const App=()=>{
+  const[screen,setScreen]=useState('loading');
+  const[user,setUser]=useState(null);
+
+  // Hash routing: sync URL hash ↔ screen state
+  const goScreen=(s,pushHistory=true)=>{
+    if(pushHistory && s!=='loading' && s!=='login'){
+      history.pushState({screen:s},'',s==='custos'?'#custos':'#hub');
+    }
+    setScreen(s);
+  };
+  useEffect(()=>{
+    // Handle browser back/forward
+    const onPop=(e)=>{
+      const hash=window.location.hash;
+      if(hash==='#custos')setScreen('custos');
+      else setScreen('hub');
+    };
+    window.addEventListener('popstate',onPop);
+    return()=>window.removeEventListener('popstate',onPop);
+  },[]);
+  useEffect(()=>{
+    sb.auth.getSession().then(({data:{session}})=>{
+      if(session){
+        const u={email:session.user.email,name:session.user.user_metadata?.name||session.user.email.split('@')[0]};
+        setUser(u);localStorage.setItem('ale308_user',JSON.stringify(u));
+        const s=window.location.hash==='#custos'?'custos':'hub';
+        goScreen(s,false);
+      }else{setScreen('login');}
+    });
+  },[]);
+  const login=u=>{setUser(u);goScreen('hub');};
+  const logout=async()=>{await sb.auth.signOut();localStorage.removeItem('ale308_user');setUser(null);history.replaceState({},'','#');setScreen('login');};
+  const select=id=>{if(id==='custos')goScreen('custos');};
+  if(screen==='loading')return(
+    <div style={{minHeight:'100vh',background:C.bg,display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:12}}>
+      <div style={{fontSize:32,filter:'drop-shadow(0 0 16px rgba(212,165,32,.4))'}}>🎯</div>
+      <div style={{fontFamily:'Barlow Condensed',color:C.gold,fontSize:13,letterSpacing:3}}>CARREGANDO...</div>
+    </div>
+  );
+  if(screen==='login') return <Login onLogin={login}/>;
+  if(screen==='hub')   return <Hub user={user} onSelect={select} onLogout={logout}/>;
+  if(screen==='custos')return <Custo user={user} onBack={()=>{history.back();}}/>;
+  return <Hub user={user} onSelect={select} onLogout={logout}/>;
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

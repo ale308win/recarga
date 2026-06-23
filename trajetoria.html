@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Calculadora de Trajetória · @ale308win</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b0f;--bg2:#101018;--bg3:#161622;--bg4:#1e1e2e;
+  --gold:#c09a3a;--gold-l:#d4b050;--gold-d:#8b7332;--gold-dim:rgba(192,154,58,.12);
+  --text:#ddd8c4;--t2:#999887;--t3:#6e6e58;
+  --b1:#2a2a3a;--b2:#383850;
+  --ok-bg:rgba(46,125,50,.25);--ok:#81c784;--ok-b:rgba(46,125,50,.4);
+  --warn-bg:rgba(249,168,37,.2);--warn:#ffd54f;--warn-b:rgba(249,168,37,.35);
+  --red-bg:rgba(198,40,40,.2);--red:#ef9a9a;--red-b:rgba(198,40,40,.35);
+  --r:2px;--r2:4px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Rajdhani',system-ui,sans-serif;font-size:14px;line-height:1.4}
+a{color:var(--gold);text-decoration:none}
+input,select,textarea{background:var(--bg);border:1px solid var(--b2);border-radius:var(--r);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--gold-d);background:#0d0d14}
+select{appearance:none;cursor:pointer}
+select option{background:var(--bg4)}
+button{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:var(--r);transition:all .2s;border:none}
+button:hover{filter:brightness(1.12)}
+button:active{transform:scale(.97)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* HEADER */
+.hdr{background:var(--bg2);border-bottom:2px solid var(--gold-d);height:54px;display:flex;align-items:center;padding:0 16px;gap:12px;position:sticky;top:0;z-index:100;flex-shrink:0}
+.hdr-logo{font-size:20px}
+.hdr-title{font-family:'Oswald',sans-serif;font-size:15px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;flex:1}
+.hdr-nav{display:flex;gap:8px;align-items:center}
+.hdr-a{color:var(--t2);font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;padding:4px 10px;border:1px solid var(--b1);border-radius:var(--r);transition:all .2s}
+.hdr-a:hover{border-color:var(--gold-d);color:var(--gold)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 54px)}
+@media(max-width:900px){.layout{grid-template-columns:1fr}  .sidebar{position:static;height:auto;overflow:visible}}
+.sidebar{background:var(--bg2);border-right:1px solid var(--b1);overflow-y:auto;height:calc(100vh - 54px);position:sticky;top:54px}
+.main{padding:16px;overflow-x:hidden}
+
+/* SECTION CARD */
+.sc{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:10px;overflow:hidden}
+.sc-hdr{background:var(--bg4);border-bottom:1px solid var(--b1);padding:8px 14px;display:flex;align-items:center;gap:8px}
+.sc-hdr span{color:var(--gold);font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;flex:1}
+.sc-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+
+/* FIELD */
+.fld{display:flex;flex-direction:column;gap:3px}
+.lbl{font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.8px;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.lbl-info{width:13px;height:13px;background:var(--bg4);border:1px solid var(--b2);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:var(--t2);cursor:pointer;position:relative}
+.lbl-info:hover .tip{display:block}
+.tip{display:none;position:absolute;left:20px;top:-4px;background:var(--bg4);border:1px solid var(--b2);border-radius:var(--r2);padding:8px 10px;font-size:11px;color:var(--t2);line-height:1.5;width:220px;z-index:50;font-weight:400;letter-spacing:0;text-transform:none}
+.fi-row{display:flex;gap:6px;align-items:center}
+.fi-row input,.fi-row select{flex:1;padding:6px 8px}
+.fi-row .unit{font-size:11px;color:var(--t2);white-space:nowrap;min-width:28px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.inp{width:100%;padding:6px 8px}
+
+/* BUTTONS */
+.btn-calc{background:var(--gold);color:#000;font-size:13px;padding:11px 0;width:100%}
+.btn-save{background:var(--bg4);color:var(--t2);border:1px solid var(--b2);font-size:11px;padding:7px 12px}
+.btn-clear{background:transparent;color:var(--t2);border:1px solid var(--b1);font-size:11px;padding:7px 12px}
+.btn-import{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-d);font-size:10px;padding:4px 9px;flex-shrink:0}
+.btn-pdf{background:#1d3b1d;color:#81c784;border:1px solid #2e7d32;font-size:11px;padding:7px 12px}
+
+/* RESULT TABLE */
+.res-wrap{overflow-x:auto;border:1px solid var(--b1);border-radius:var(--r2)}
+.tbl{width:100%;border-collapse:collapse;min-width:680px}
+.tbl th{background:var(--bg4);color:var(--gold);font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;padding:8px 10px;text-align:center;border-bottom:1px solid var(--b1);white-space:nowrap}
+.tbl th:first-child{text-align:left;padding-left:14px}
+.tbl td{padding:6px 10px;font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--gold-l);text-align:center;border-bottom:1px solid var(--b1)}
+.tbl td:first-child{text-align:left;padding-left:14px;color:var(--t2);font-size:11px;font-family:'Oswald',sans-serif;letter-spacing:1px}
+.tbl tr:hover td{background:rgba(192,154,58,.04)}
+.tbl .zero-row td{background:rgba(192,154,58,.08)}
+.tbl .zero-row td:first-child{color:var(--gold)}
+.tbl .sub-row td{color:var(--t2);font-size:11px}
+.tbl .crit td{color:#ef9a9a}
+.badge-sm{display:inline-block;font-size:9px;font-family:'Rajdhani',sans-serif;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.3px}
+
+/* CHART */
+.chart-wrap{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 16px;margin-bottom:10px}
+.chart-title{font-family:'Oswald',sans-serif;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+#trajectoryChart{width:100%;height:200px;display:block}
+
+/* METRICS SUMMARY */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.metric-box{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);padding:10px 12px}
+.metric-lbl{font-family:'Oswald',sans-serif;font-size:10px;color:var(--t2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
+.metric-val{font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;color:var(--gold-l)}
+.metric-unit{font-size:10px;color:var(--t2);margin-left:3px}
+
+/* DISCLAIMER */
+.disc{background:var(--gold-dim);border:1px solid var(--b1);border-left:3px solid var(--gold-d);padding:8px 12px;border-radius:0 var(--r2) var(--r2) 0;margin-bottom:10px}
+.disc p{font-size:11px;color:var(--t2);line-height:1.5}
+
+/* INFO CARDS */
+.info-section{margin-top:10px}
+.info-card{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r2);padding:12px;margin-bottom:8px}
+.info-card h3{font-family:'Oswald',sans-serif;font-size:12px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.info-card p{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:6px}
+.info-card strong{color:var(--text)}
+.warn-box{background:var(--warn-bg);border:1px solid var(--warn-b);border-radius:var(--r);padding:6px 10px;font-size:11px;color:var(--warn);line-height:1.5}
+.ok-box{background:var(--ok-bg);border:1px solid var(--ok-b);border-radius:var(--r);padding:6px 10px;font-size:11px;color:var(--ok);line-height:1.5}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--t3)}
+.empty h2{font-family:'Oswald',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold-d);margin-bottom:8px}
+
+/* PROFILE LIST */
+.prof-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.prof-item{background:var(--bg4);border:1px solid var(--b1);border-radius:var(--r);padding:7px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:border-color .2s}
+.prof-item:hover{border-color:var(--gold-d)}
+.prof-item-name{flex:1;font-size:12px;color:var(--text);font-family:'Oswald',sans-serif;letter-spacing:.5px}
+.prof-item-meta{font-size:10px;color:var(--t3)}
+.prof-del{color:var(--t3);font-size:11px;background:none;border:none;padding:2px 5px;cursor:pointer;font-family:monospace;opacity:.6}
+.prof-del:hover{opacity:1;color:#ef9a9a}
+.footer{text-align:center;padding:14px;font-size:11px;color:var(--t3);border-top:1px solid var(--b1);margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <span class="hdr-logo">🎯</span>
+  <span class="hdr-title">Calculadora de Trajetória</span>
+  <div class="hdr-nav">
+    <a class="hdr-a" href="https://ale308win.github.io/cronografo/" target="_blank">Cronógrafo</a>
+    <a class="hdr-a" href="https://ale308win.github.io/recargas/" target="_blank">Recargas</a>
+    <a class="hdr-a" href="https://instagram.com/ale308win" target="_blank">@ale308win</a>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<div class="sidebar" id="sidebar">
+  <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+
+  <!-- ATIRADOR & SESSÃO -->
+  <div class="sc">
+    <div class="sc-hdr"><span>👤 Atirador &amp; Sessão</span></div>
+    <div class="sc-body">
+      <div class="fld"><div class="lbl">Nome do Atirador</div><input class="inp" type="text" id="inpNomeAtirador" placeholder="Ex: João Silva" style="width:100%"></div>
+      <div class="fld"><div class="lbl">Data</div><input class="inp" type="date" id="inpData" style="width:100%"></div>
+    </div>
+  </div>
+
+  <!-- DISC -->
+  <div class="disc">
+    <p>⚠ <strong style="color:var(--text)">Dados de referência.</strong> Use como guia de campo. Confirme com dados reais na ordem — cronógrafo + tiro de confirmação no alvo.</p>
+  </div>
+
+  <!-- ARMA -->
+  <div class="sc">
+    <div class="sc-hdr"><span>🔫 Arma</span></div>
+    <div class="sc-body">
+      <div class="fld"><div class="lbl">Modelo da Arma</div><input class="inp" type="text" id="inpModeloArma" placeholder="Ex: Ruger Precision Rifle" style="width:100%"></div>
+      <div class="fld"><div class="lbl">Comprimento do Cano</div><div class="fi-row"><input class="inp" type="number" id="inpCanoCm" value="" step="0.5" min="6" max="100" placeholder="—"><select id="inpCanoUnit" style="width:70px;padding:6px 4px"><option value="pol">pol</option><option value="cm">cm</option></select></div></div>
+    </div>
+  </div>
+
+  <!-- CALIBRE E CARGA -->
+  <div class="sc">
+    <div class="sc-hdr"><span>🎯 Projétil &amp; Carga</span></div>
+    <div class="sc-body">
+      <div class="fld">
+        <div class="lbl">Calibre</div>
+        <select class="inp" id="inpCalibre">
+          <option value="">— Selecionar —</option>
+          <optgroup label="Pistola / Revólver">
+            <option>.22 Short</option><option>.22 Long</option><option>.22 LR</option><option>.22 WMR</option><option>.22 Remington Jet</option><option>.221 Remington Fireball</option><option>.22 TCM</option><option>5.7x28 FN</option><option>4.6x30 HK</option><option>.25 ACP</option><option>7.62x25 Tokarev</option><option>7.63x25 Mauser</option><option>.30 Luger</option><option>.32 ACP</option><option>.32 S&amp;W</option><option>.32 S&amp;W Curto</option><option>.32 S&amp;W Long</option><option>.32 H&amp;R Magnum</option><option>.327 Federal Magnum</option><option>.32-20 Winchester</option><option>.380 ACP</option><option>.380 Auto +P</option><option>9x18 Makarov</option><option>9mm Luger</option><option>9mm Luger +P</option><option>9x21 IMI</option><option>9x23 Winchester</option><option>.38 Super</option><option>.38 ACP</option><option>9mm Browning Long</option><option>.357 SIG</option><option>.38 S&amp;W</option><option>.38 S&amp;W Long</option><option>.38 Short Colt</option><option>.38 Long Colt</option><option>.38 Special</option><option>.38 SPL +P</option><option>.38 SPL +P+</option><option>.357 Magnum</option><option>.357 Remington Maximum</option><option>.256 Winchester Magnum</option><option>.40 S&amp;W</option><option>10mm Auto</option><option>.38-40 Winchester</option><option>.400 Cor-Bon</option><option>.41 Remington Magnum</option><option>.41 Action Express</option><option>.44 Special</option><option>.44 Magnum</option><option>.44-40 Winchester</option><option>.44 Russian</option><option>.44 Auto Mag</option><option>.45 ACP</option><option>.45 Auto +P</option><option>.45 Auto Rim</option><option>.45 GAP</option><option>.45 Colt</option><option>.454 Casull</option><option>.45 Winchester Magnum</option><option>.45 Super</option><option>.460 S&amp;W Magnum</option><option>.475 Linebaugh</option><option>.480 Ruger</option><option>.50 AE</option><option>.500 S&amp;W Magnum</option><option>.500 Linebaugh</option><option>.50 GI</option><option>7.5 FK</option>
+          </optgroup>
+          <optgroup label="Rifle / Fuzil">
+            <option>.17 HMR</option><option>.17 WSM</option><option>.17 Hornet</option><option>.17 Remington</option><option>.17 Remington Fireball</option><option>.204 Ruger</option><option>5mm Remington Magnum</option><option>.22 Hornet</option><option>.218 Bee</option><option>.222 Remington</option><option>.223 Remington</option><option>5.56x45 NATO</option><option>.22-250 Remington</option><option>.220 Swift</option><option>.225 Winchester</option><option>.22 Nosler</option><option>.224 Valkyrie</option><option>.22 ARC</option><option>.22 Creedmoor</option><option>.243 Winchester</option><option>6mm Remington</option><option>6mm Creedmoor</option><option>6mm ARC</option><option>6mm GT</option><option>6mm BR Norma</option><option>6mm XC</option><option>.240 Weatherby Magnum</option><option>.25-20 Winchester</option><option>.25-35 Winchester</option><option>.250 Savage</option><option>.257 Roberts</option><option>.25-06 Remington</option><option>.257 Weatherby Magnum</option><option>25 Creedmoor</option><option>6.5 Creedmoor</option><option>6.5 Grendel</option><option>6.5 PRC</option><option>6.5x55 Swedish</option><option>.260 Remington</option><option>6.5-284 Norma</option><option>6.5x47 Lapua</option><option>.264 Winchester Magnum</option><option>.26 Nosler</option><option>6.5-300 Weatherby Magnum</option><option>6.5x52 Carcano</option><option>.270 Winchester</option><option>.270 WSM</option><option>.270 Weatherby Magnum</option><option>6.8 SPC</option><option>6.8 Western</option><option>.277 SIG Fury</option><option>7mm-08 Remington</option><option>7x57 Mauser</option><option>.280 Remington</option><option>.280 Ackley Improved</option><option>.284 Winchester</option><option>7mm Remington Magnum</option><option>7mm WSM</option><option>7mm PRC</option><option>7mm Backcountry</option><option>7mm Weatherby Magnum</option><option>7mm STW</option><option>7mm RUM</option><option>7x64 Brenneke</option><option>28 Nosler</option><option>.30 Carbine</option><option>.300 Blackout</option><option>7.62x39</option><option>.30-30 Winchester</option><option>.308 Winchester</option><option>7.62x51 NATO</option><option>.30-06 Springfield</option><option>.300 Savage</option><option>.30-40 Krag</option><option>.300 Winchester Magnum</option><option>.300 WSM</option><option>.300 PRC</option><option>.300 RUM</option><option>.300 Weatherby Magnum</option><option>.300 H&amp;H Magnum</option><option>.300 Norma Magnum</option><option>.30 Nosler</option><option>7.62x54R</option><option>7.5x55 Swiss</option><option>7.5x54 French</option><option>8x57 Mauser</option><option>8mm Remington Magnum</option><option>8x68S</option><option>.325 WSM</option><option>.338 Federal</option><option>.338 Winchester Magnum</option><option>.338 Lapua Magnum</option><option>.338-06</option><option>.338 Norma Magnum</option><option>.340 Weatherby Magnum</option><option>.33 Nosler</option><option>8.6 Blackout</option><option>.338 ARC</option><option>.35 Remington</option><option>.350 Legend</option><option>.358 Winchester</option><option>.35 Whelen</option><option>.356 Winchester</option><option>.360 Buckhammer</option><option>.348 Winchester</option><option>9.3x62 Mauser</option><option>9.3x74R</option><option>9.3x64 Brenneke</option><option>.375 H&amp;H Magnum</option><option>.375 Ruger</option><option>.375 RUM</option><option>.376 Steyr</option><option>.375 CheyTac</option><option>.400 Legend</option><option>.405 Winchester</option><option>.416 Rigby</option><option>.416 Remington Magnum</option><option>.416 Ruger</option><option>.416 Barrett</option><option>.404 Jeffery</option><option>.444 Marlin</option><option>.45-70 Government</option><option>.450 Bushmaster</option><option>.450 Marlin</option><option>.458 Winchester Magnum</option><option>.458 SOCOM</option><option>.458 Lott</option><option>.460 Weatherby Magnum</option><option>.470 Nitro Express</option><option>.50 Beowulf</option><option>.500 Nitro Express</option><option>.505 Gibbs</option><option>.577 Nitro Express</option><option>.600 Nitro Express</option><option>.700 Nitro Express</option><option>.50 BMG</option><option>5.45x39</option><option>5.8x42</option><option>.303 British</option><option>7.35x51 Carcano</option><option>8x56R</option>
+          </optgroup>
+          <optgroup label="Espingarda">
+            <option>12</option><option>12/70</option><option>12/76,2</option><option>16</option><option>16/70</option><option>20</option><option>20/70</option><option>20/76,2</option><option>24</option><option>24/65</option><option>28</option><option>28/70</option><option>32</option><option>32/63,5</option><option>36</option><option>36/63,5</option><option>36/76,2</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="grid2">
+        <div class="fld">
+          <div class="lbl">Peso proj.
+            <span class="lbl-info">?<span class="tip">Peso do projétil em grains (gr). 1 grain = 0,0648g. Projéteis de rifle típicos: 55–180gr para .223/.308. Peso afeta BC e energia residual.</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpPeso" value="168" step="1" min="30" max="750"><span class="unit">gr</span></div>
+        </div>
+        <div class="fld">
+          <div class="lbl">Diâmetro
+            <span class="lbl-info">?<span class="tip">Diâmetro do projétil em polegadas. .308 Win = 0.308", .223 = 0.224", 6.5mm = 0.264". Necessário para cálculo de densidade seccional.</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpDiam" value="0.308" step="0.001"><span class="unit">pol</span></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="fld">
+          <div class="lbl">BC
+            <span class="lbl-info">?<span class="tip">Coeficiente Balístico. G7 é mais preciso para projéteis modernos de rifle (spitzer, BTHP). G1 é o padrão mais antigo. Para armas curtas use G1. Quanto maior o BC, menos o projétil desacelera.</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpBC" value="0.243" step="0.001" min="0.1" max="1.2"><span class="unit"></span></div>
+        </div>
+        <div class="fld">
+          <div class="lbl">Modelo BC</div>
+          <select class="inp" id="inpBCtype">
+            <option value="G7">G7 (rifle moderno)</option>
+            <option value="G1">G1 (padrão / pistola)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VELOCIDADE -->
+  <div class="sc">
+    <div class="sc-hdr">
+      <span>📡 Velocidade Inicial (V₀)</span>
+      <button class="btn-import" onclick="importFromCrono()">↓ Cronógrafo</button>
+    </div>
+    <div class="sc-body">
+      <div class="fld">
+        <div class="lbl">V₀
+          <span class="lbl-info">?<span class="tip">Velocidade de boca medida pelo cronógrafo. Use sempre a média (AVG) de uma sessão real. Dados de catálogo podem diferir até 150fps do seu cartucho real.</span></span>
+        </div>
+        <div class="fi-row">
+          <input class="inp" type="number" id="inpV0" value="2600" step="10" min="500" max="5000">
+          <select id="inpV0unit" style="width:70px;padding:6px 4px">
+            <option value="fps">fps</option>
+            <option value="ms">m/s</option>
+          </select>
+        </div>
+      </div>
+      <div id="cronoPerfil" style="display:none;background:var(--ok-bg);border:1px solid var(--ok-b);border-radius:var(--r);padding:6px 10px;font-size:11px;color:var(--ok)"></div>
+    </div>
+  </div>
+
+  <!-- DADOS DE RECARGA -->
+  <div class="sc">
+    <div class="sc-hdr"><span>⚙️ Dados de Recarga</span></div>
+    <div class="sc-body">
+      <div class="fld"><div class="lbl">OAL (Comprimento Total)</div><div class="fi-row"><input class="inp" type="number" id="inpOAL" placeholder="—" step="0.001" min="0" max="100"><span class="unit">pol</span></div></div>
+      <div class="grid2">
+        <div class="fld"><div class="lbl">Fabricante Projétil</div><input class="inp" type="text" id="inpFabProj" placeholder="Ex: Hornady" style="width:100%"></div>
+        <div class="fld"><div class="lbl">Tipo Projétil</div><input class="inp" type="text" id="inpTipoProj" placeholder="Ex: BTHP" style="width:100%"></div>
+      </div>
+      <div class="grid2">
+        <div class="fld"><div class="lbl">Estojo</div><input class="inp" type="text" id="inpEstojo" placeholder="Ex: Lapua" style="width:100%"></div>
+        <div class="fld"><div class="lbl">Altura Estojo</div><div class="fi-row"><input class="inp" type="number" id="inpAltEstojo" placeholder="—" step="0.01"><span class="unit">mm</span></div></div>
+      </div>
+      <div class="fld"><div class="lbl">Espoleta</div>
+        <select class="inp" id="inpEspoleta">
+          <option value="">— Selecionar —</option>
+          <option>Small Pistol 1½</option><option>Large Pistol 2½</option><option>Small Pistol Magnum 5½</option><option>Small Rifle 7½</option><option>Large Rifle 9½</option><option>209</option>
+        </select>
+      </div>
+      <div class="fld"><div class="lbl">Fabricante da Pólvora</div>
+        <select class="inp" id="inpFabPolvora" onchange="atualizarModelosPolvora()">
+          <option value="">— Selecionar —</option>
+          <option>Hodgdon</option><option>IMR</option><option>Winchester</option><option>Accurate</option><option>Ramshot</option><option>Alliant</option><option>Vihtavuori</option><option>Reload Swiss</option><option>Norma</option><option>ADI</option><option>Shooters World</option><option>Lovex</option><option>Vectan</option><option>Vectan / Nobel Sport</option><option>Maxam</option><option>B&amp;P</option><option>Cheddite</option><option>GOEX</option><option>Schuetzen</option><option>Swiss Black Powder</option><option>CBC</option><option>FOX</option><option>IMBEL</option><option>Presidente</option><option>Thor</option>
+        </select>
+      </div>
+      <div class="fld"><div class="lbl">Modelo da Pólvora</div>
+        <select class="inp" id="inpModeloPolvora"><option value="">— selecione fabricante —</option></select>
+      </div>
+      <div class="fld"><div class="lbl">Lote</div><input class="inp" type="text" id="inpLotePolvora" placeholder="Nº do lote (manual)" style="width:100%"></div>
+    </div>
+  </div>
+
+  <!-- ÓPTICA E ZERO -->
+  <div class="sc">
+    <div class="sc-hdr"><span>🔭 Óptica &amp; Zero</span></div>
+    <div class="sc-body">
+      <div class="grid2">
+        <div class="fld"><div class="lbl">Fabricante</div><input class="inp" type="text" id="inpFabOptica" placeholder="Ex: Vortex" style="width:100%"></div>
+        <div class="fld"><div class="lbl">Modelo</div><input class="inp" type="text" id="inpModeloOptica" placeholder="Ex: Razor HD" style="width:100%"></div>
+      </div>
+      <div class="grid2">
+        <div class="fld"><div class="lbl">Tubo</div>
+          <select class="inp" id="inpTuboOptica">
+            <option value="">—</option><option>1" (25.4mm)</option><option>30mm</option><option>34mm</option><option>35mm</option><option>40mm</option>
+          </select>
+        </div>
+        <div class="fld"><div class="lbl">Aumento</div><input class="inp" type="text" id="inpAumentoOptica" placeholder="Ex: 5-25x56" style="width:100%"></div>
+      </div>
+      <div class="grid2">
+        <div class="fld">
+          <div class="lbl">Altura óptica
+            <span class="lbl-info">?<span class="tip">Distância vertical entre o centro do cano e o centro da óptica/mira. Tipicamente 38–50mm para riflescopes com anéis altos. Influencia a trajetória especialmente a curta distância.</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpScopeH" value="40" step="1" min="10" max="100"><span class="unit">mm</span></div>
+        </div>
+        <div class="fld">
+          <div class="lbl">Zero a
+            <span class="lbl-info">?<span class="tip">Distância em que o projétil cruza a linha de mira pela segunda vez (zero balístico). Escolhas comuns: 100m (zero simples), 200m (MPBR otimizado), 300m (para rifles de longo alcance).</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpZero" value="100" step="25" min="25" max="1000"><span class="unit">m</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONDIÇÕES ATMOSFÉRICAS -->
+  <div class="sc">
+    <div class="sc-hdr"><span>🌡 Condições Atmosféricas</span></div>
+    <div class="sc-body">
+      <div class="grid2">
+        <div class="fld">
+          <div class="lbl">Altitude
+            <span class="lbl-info">?<span class="tip">Altitude do local de tiro (m). Em altitudes maiores o ar é mais rarefeito — MENOS arrasto, projétil voa MAIS. A 1000m de altitude o projétil tem ~10% menos arrasto que ao nível do mar.</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpAlt" value="800" step="50" min="0" max="5000"><span class="unit">m</span></div>
+        </div>
+        <div class="fld">
+          <div class="lbl">Temperatura
+            <span class="lbl-info">?<span class="tip">Temperatura do ar (°C). Ar quente = menos denso = menos arrasto. Frio = mais arrasto. Impacto significativo em tiros acima de 500m.</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpTemp" value="25" step="1" min="-30" max="50"><span class="unit">°C</span></div>
+        </div>
+        <div class="fld">
+          <div class="lbl">Pressão
+            <span class="lbl-info">?<span class="tip">Pressão barométrica (mbar = hPa). Padrão ao nível do mar: 1013 mbar. Em altitude reduz automaticamente. Uso avançado: deixe em 1013 e use apenas o campo Altitude para simplificar.</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpPress" value="1013" step="1" min="850" max="1080"><span class="unit">mb</span></div>
+        </div>
+        <div class="fld">
+          <div class="lbl">Humidade
+            <span class="lbl-info">?<span class="tip">Umidade relativa do ar (%). Impacto pequeno (&lt;1%) mas incluído para precisão. Ar úmido é levemente menos denso que ar seco.</span></span>
+          </div>
+          <div class="fi-row"><input class="inp" type="number" id="inpHum" value="60" step="5" min="0" max="100"><span class="unit">%</span></div>
+        </div>
+      </div>
+      <div class="fld">
+        <div class="lbl">Vento
+          <span class="lbl-info">?<span class="tip">90° = vento da direita (deriva máxima p/ esquerda). 270° = da esquerda (deriva p/ direita). 0° ou 180° = vento de frente/cauda (sem deriva lateral). Use sempre 90° para o pior caso.</span></span>
+        </div>
+        <div class="fi-row">
+          <input class="inp" type="number" id="inpWind" value="0" step="1" min="0" max="100" style="flex:2">
+          <span class="unit">km/h</span>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:2px">Direção: <select id="inpWindAng" style="background:var(--bg);border:1px solid var(--b2);border-radius:var(--r);color:var(--text);font-family:Rajdhani,sans-serif;font-size:12px;padding:3px 6px;outline:none">
+          <option value="90">90° — Da direita (cruzado ↔)</option>
+          <option value="270">270° — Da esquerda (cruzado ↔)</option>
+          <option value="45">45° — Diagonal direita</option>
+          <option value="135">135° — Diagonal esquerda</option>
+          <option value="0">0° — De trás (sem deriva)</option>
+          <option value="180">180° — De frente (sem deriva)</option>
+        </select></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIGURAÇÃO DA TABELA -->
+  <div class="sc">
+    <div class="sc-hdr"><span>⚙ Configurar Tabela</span></div>
+    <div class="sc-body">
+      <div class="grid2">
+        <div class="fld">
+          <div class="lbl">Distância máx.</div>
+          <div class="fi-row"><input class="inp" type="number" id="inpMaxDist" value="800" step="100" min="100" max="2000"><span class="unit">m</span></div>
+        </div>
+        <div class="fld">
+          <div class="lbl">Incremento</div>
+          <select class="inp" id="inpIncr">
+            <option value="25">25 m</option>
+            <option value="50" selected>50 m</option>
+            <option value="100">100 m</option>
+          </select>
+        </div>
+      </div>
+      <div class="fld">
+        <div class="lbl">Unidade angular
+          <span class="lbl-info">?<span class="tip">MOA (Minute of Angle) = 2.908cm a 100m. MIL/MRAD = 10cm a 100m. Escopo com turret MOA: use MOA. Escopo MIL (mais comum em precisão): use MIL.</span></span>
+        </div>
+        <select class="inp" id="inpUnit">
+          <option value="moa">MOA (2,908cm @ 100m)</option>
+          <option value="mil" selected>MIL / MRAD (10cm @ 100m)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTÕES -->
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <button class="btn-calc" onclick="calcular()">⚡ CALCULAR TRAJETÓRIA</button>
+    <div style="display:flex;gap:6px">
+      <button class="btn-save" onclick="salvarPerfil()" style="flex:1">💾 Salvar Perfil</button>
+      <button class="btn-pdf" onclick="exportarPDF()" style="flex:1">📄 PDF</button>
+    </div>
+  </div>
+
+  <!-- PERFIS SALVOS -->
+  <div id="profSection" style="display:none">
+    <div style="font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.8px;text-transform:uppercase;margin:8px 0 6px">Perfis Salvos</div>
+    <div class="prof-list" id="profList"></div>
+  </div>
+
+  </div><!-- /padding -->
+</div><!-- /sidebar -->
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<div class="main" id="mainArea">
+
+  <!-- EMPTY STATE -->
+  <div class="empty" id="emptyState">
+    <div style="font-size:40px;margin-bottom:12px;opacity:.3">📐</div>
+    <h2>Configure e calcule</h2>
+    <p style="color:var(--t3);font-size:13px;max-width:400px;margin:0 auto;line-height:1.6">Preencha os dados da arma, projétil e condições atmosféricas no painel ao lado. Clique em <strong style="color:var(--gold)">Calcular Trajetória</strong> para gerar a tabela e o gráfico.</p>
+    <div style="margin-top:24px;display:flex;flex-direction:column;gap:8px;max-width:380px;margin-left:auto;margin-right:auto">
+      <div class="ok-box">✅ <strong>Diferencial:</strong> use seu V₀ real do Cronógrafo — não dado de catálogo</div>
+      <div class="warn-box">⚠ Use sempre G7 para projéteis de rifle modernos (BTHP, Spitzer) — G1 superestima arrasto</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsArea" style="display:none">
+
+    <!-- HEADER DO RESULTADO -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div>
+        <div id="resTitle" style="font-family:'Oswald',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px"></div>
+        <div id="resSub" style="font-size:12px;color:var(--t2);margin-top:2px"></div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-clear" onclick="document.getElementById('resultsArea').style.display='none';document.getElementById('emptyState').style.display=''">Limpar</button>
+        <button class="btn-pdf" onclick="exportarPDF()">📄 Exportar PDF</button>
+      </div>
+    </div>
+
+    <!-- MÉTRICAS RESUMO -->
+    <div class="metric-grid" id="metricGrid"></div>
+
+    <!-- CHART -->
+    <div class="chart-wrap">
+      <div class="chart-title">📈 Trajetória Visual</div>
+      <svg id="trajectoryChart" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+    <!-- TABELA -->
+    <div class="res-wrap" style="margin-bottom:10px">
+      <table class="tbl" id="resTable">
+        <thead id="resThead"></thead>
+        <tbody id="resTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- LEGENDA ANGULAR -->
+    <div class="info-section" id="legendSection"></div>
+
+    <!-- INFO EDUCATIVA -->
+    <div class="info-section">
+      <div class="info-card">
+        <h3>📖 Interpretando os Resultados</h3>
+        <p><strong>Queda (cm):</strong> distância vertical que o projétil cai abaixo da linha de mira. Negativo = abaixo. Valores próximos de zero na distância de zero são esperados.</p>
+        <p><strong>MOA/MIL:</strong> quanto ajustar no turret da luneta para compensar a queda. 1 MOA = 2,91cm a 100m. 1 MIL = 10cm a 100m. Use a unidade dos seus turrets.</p>
+        <p><strong>Deriva de vento:</strong> deslocamento lateral causado pelo vento. Calculado para vento cruzado de 90°. Outros ângulos: multiplique pelo seno do ângulo (ex: 45° = 0,707×).</p>
+        <p><strong>Energia residual (J):</strong> energia cinética do projétil na distância. Caça maior requer mínimo 1.500J. Autodefesa e tiro esportivo: sem limite legal.</p>
+      </div>
+      <div class="info-card">
+        <h3>⚠ Pontos Críticos de Atenção</h3>
+        <div class="warn-box" style="margin-bottom:8px">Região <strong>transônica (340–500m/s, ~1100–1650fps)</strong>: projétil instabiliza ao transitar de supersônico para subsônico. Evite engajamentos na faixa transônica — precisão cai drasticamente. Essa distância varia conforme calibre, peso e BC.</div>
+        <div class="warn-box" style="margin-bottom:8px">BC publicado pelo fabricante pode diferir até <strong>15%</strong> do real. Confirme seus resultados com tiro real a 300m e 500m e ajuste o BC até corresponder.</div>
+        <div class="ok-box">Use sempre <strong>V₀ medido pelo cronógrafo</strong> — a diferença entre dado de catálogo e lote real pode ser 50–150fps, causando erros de 10–20cm a 500m.</div>
+      </div>
+      <div class="info-card">
+        <h3>🔬 G7 vs G1 — Por que importa</h3>
+        <p><strong>G1</strong> foi criado para projéteis cilíndricos com ponta plana do século XIX. <strong>Superestima o arrasto</strong> de projéteis modernos tipo BTHP, Spitzer e VLD em até 20% acima de 500m.</p>
+        <p><strong>G7</strong> foi desenvolvido especificamente para projéteis de rifle modernos de longo alcance. Muito mais preciso para projéteis com base em barco (boat-tail). Use G7 sempre que o fabricante fornecer o valor — Berger, Sierra, Hornady fornecem ambos.</p>
+        <p><strong>Para pistola:</strong> use G1. Projéteis de pistola (FMJ, JHP) se encaixam melhor no perfil G1, e as distâncias típicas (&lt;50m) tornam a diferença insignificante.</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <a href="https://instagram.com/ale308win" target="_blank">@ale308win</a> · Material de apoio ao curso de recarga · Confirme sempre com tiro real de comprovação
+    </div>
+  </div><!-- /resultsArea -->
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// ═══════════════════════════════════════════
+// FÍSICA: ponto-massa com integração numérica
+// Calibrado contra JBM Ballistics
+// ═══════════════════════════════════════════
+
+// Tabela G7 de Litz (Applied Ballistics) — Mach vs Cd
+const G7_TBL = [
+  [0,.1198],[.5,.1197],[.7,.1196],[.75,.1194],[.8,.1193],[.85,.1194],
+  [.9,.1194],[.95,.1192],[1,.1208],[1.05,.1518],[1.1,.1835],[1.15,.2042],
+  [1.2,.22],[1.3,.2269],[1.4,.2291],[1.5,.2297],[1.6,.2278],[1.7,.2247],
+  [1.8,.2185],[2,.2047],[2.2,.1901],[2.4,.1755],[2.6,.1612],[2.8,.1473],
+  [3,.1339],[4,.0807],[5,.0468]
+];
+// Tabela G1 de Litz
+const G1_TBL = [
+  [0,.2629],[.5,.194],[.7,.1739],[.8,.1632],[.9,.154],[.95,.144],
+  [1,.1517],[1.05,.2031],[1.1,.2187],[1.2,.2369],[1.3,.2497],[1.4,.2587],
+  [1.5,.2649],[1.6,.2688],[1.8,.2721],[2,.2718],[2.5,.2611],[3,.2451],[5,.192]
+];
+
+function lerpTable(tbl, x) {
+  if (x <= tbl[0][0]) return tbl[0][1];
+  if (x >= tbl[tbl.length-1][0]) return tbl[tbl.length-1][1];
+  for (let i=1;i<tbl.length;i++) {
+    if (x<=tbl[i][0]) {
+      const t=(x-tbl[i-1][0])/(tbl[i][0]-tbl[i-1][0]);
+      return tbl[i-1][1]+t*(tbl[i][1]-tbl[i-1][1]);
+    }
+  }
+}
+
+// Constantes de calibração (derivadas empiricamente contra JBM)
+// a = -(ρ/ρ₀) × v² × Cd(M) / (BC × K)
+const K_G7 = 5245;
+const K_G1 = 2424.6;
+
+function calcDecel(v, bc, bcType, densRatio, c) {
+  const M = v / c;
+  const Cd = bcType === 'G7' ? lerpTable(G7_TBL, M) : lerpTable(G1_TBL, M);
+  const K = bcType === 'G7' ? K_G7 : K_G1;
+  return -densRatio * v * v * Cd / (bc * K);
+}
+
+function calcTrajetoria(params) {
+  const { v0fps, bc, bcType, pesoGr, scopeHeightMm, zeroDist,
+          altM, tempC, pressHPa, humPct, windKmh, windAngDeg,
+          maxDist, increment } = params;
+
+  const g = 9.80665;
+  const v0 = v0fps * 0.3048; // m/s
+  const scopeH = scopeHeightMm / 1000; // m
+  const massKg = (pesoGr / 7000) * 0.453592;
+
+  // Atmosfera
+  const T = tempC + 273.15;
+  const T0 = 288.15;
+  const altFactor = Math.exp(-altM / 8434);
+  const tempFactor = T0 / T;
+  const densRatio = (pressHPa / 1013.25) * altFactor * tempFactor * (1 - 0.0004 * humPct/100);
+  const c = 331.3 * Math.sqrt(T / 273.15); // vel. do som m/s
+
+  // Vento (componente cruzada em m/s)
+  const windMs = windKmh / 3.6;
+  const windCross = windMs * Math.sin(windAngDeg * Math.PI / 180); // positivo = direita
+
+  const dt = 0.001; // 1ms
+  const maxT = 10; // máximo 10s
+
+  // ─── PASSO 1: encontrar ângulo de lançamento para zero na distância configurada ───
+  function simX(launchAngleRad) {
+    let vx = v0 * Math.cos(launchAngleRad);
+    let vy = v0 * Math.sin(launchAngleRad);
+    let x = 0, y = -scopeH;
+    let prevX = 0, prevY = -scopeH;
+    for (let t=0; t<maxT; t+=dt) {
+      const v = Math.sqrt(vx*vx + vy*vy);
+      const a = calcDecel(v, bc, bcType, densRatio, c);
+      const ax = a * vx/v;
+      const ay = a * vy/v - g;
+      vx += ax * dt;
+      vy += ay * dt;
+      prevX = x; prevY = y;
+      x += vx * dt;
+      y += vy * dt;
+      if (x >= zeroDist) {
+        // Interpola y no ponto exato zeroDist
+        const frac = (zeroDist - prevX) / (x - prevX);
+        return prevY + frac * (y - prevY);
+      }
+    }
+    return -999;
+  }
+
+  // Busca binária para ângulo
+  let lo = -0.05, hi = 0.1;
+  for (let iter=0; iter<40; iter++) {
+    const mid = (lo + hi) / 2;
+    const yAtZero = simX(mid);
+    if (yAtZero < 0) lo = mid; else hi = mid;
+  }
+  const launchAngle = (lo + hi) / 2;
+
+  // ─── PASSO 2: simular trajetória completa e coletar dados ───
+  let vx = v0 * Math.cos(launchAngle);
+  let vy = v0 * Math.sin(launchAngle);
+  let vz = 0; // drift lateral
+  let x = 0, y = -scopeH, z = 0;
+  let tof = 0;
+
+  const rows = [];
+  let nextDist = 0;
+  let prevX = 0, prevY = -scopeH, prevZ = 0, prevTof = 0;
+  let prevVx = vx, prevVy = vy, prevVz = vz;
+
+  function interpVal(a, b, frac) { return a + frac*(b-a); }
+
+  function addRow(dist, rx, ry, rz, rtof, rvx, rvy) {
+    const dropCm = ry * 100;
+    const rv = Math.sqrt(rvx*rvx + rvy*rvy);
+    const vmps = rv;
+    const vfps = rv / 0.3048;
+    const joules = 0.5 * massKg * rv * rv;
+    const windDriftCm = rz * 100;
+    const heightCm = (ry + scopeH) * 100; // altura acima do cano (0 = nível do cano)
+  return { dist, dropCm, heightCm, vmps, vfps, joules, tof: rtof, windDriftCm };
+  }
+
+  while (x < maxDist + increment && tof < maxT) {
+    const v = Math.sqrt(vx*vx + vy*vy);
+    const a = calcDecel(v, bc, bcType, densRatio, c);
+    const ax = a * vx/v;
+    const ay = a * vy/v - g;
+    // Drift lateral por vento (force simplificada)
+    const az = windCross * a / v; // vento acelera lateralmente proportional a arrasto
+    vx += ax*dt; vy += ay*dt; vz += az*dt;
+    prevX=x; prevY=y; prevZ=z; prevTof=tof;
+    prevVx=vx; prevVy=vy;
+    x += vx*dt; y += vy*dt; z += vz*dt;
+    tof += dt;
+
+    while (nextDist <= x && nextDist <= maxDist) {
+      if (x === prevX) { nextDist += increment; continue; }
+      const frac = (nextDist - prevX) / (x - prevX);
+      const ry = interpVal(prevY, y, frac);
+      const rz = interpVal(prevZ, z, frac);
+      const rtof = interpVal(prevTof, tof, frac);
+      const rvx = interpVal(prevVx, vx, frac);
+      const rvy = interpVal(prevVy, vy, frac);
+      rows.push(addRow(nextDist, nextDist, ry, rz, rtof, rvx, rvy));
+      nextDist += increment;
+    }
+    if (v < 100) break; // projétil parou
+  }
+
+  // Calcular velocidade transônica (M=1.2)
+  const vTrans = c * 1.2;
+  const vSub = c * 1.0;
+  const vmpsArr = rows.map(r=>r.vmps);
+  const transIdx = vmpsArr.findIndex(v=>v <= vTrans);
+  const subIdx = vmpsArr.findIndex(v=>v <= vSub);
+
+  return { rows, transIdx, subIdx, densRatio, c, v0, launchAngle };
+}
+
+// ═══════════════════════════════════════════
+// PÓLVORAS POR FABRICANTE
+// ═══════════════════════════════════════════
+const PD_TRAJ = {
+  'Hodgdon':['Titegroup','CFE Pistol','HS-6','Longshot','H110',"Lil'Gun",'H4198','Benchmark','H322','H335','BL-C(2)','CFE 223','CFE BLK','LEVERevolution','Varget','H4895','H4350','H4831SC','H1000','Retumbo','US 869','Superformance'],
+  'IMR':['IMR 4227','IMR 4198','IMR 3031','IMR 4064','IMR 4895','IMR 4350','IMR 4831','IMR 8208 XBR','IMR 7828 SSC'],
+  'Winchester':['231','244','296','WST','WSF','572','748','760','StaBALL 6.5','StaBALL Match','StaBALL HD'],
+  'Accurate':['No. 2','No. 5','No. 7','No. 9','4100','5744','1680','2015','2200','2230','2460','2520','2700','4350','MagPro'],
+  'Ramshot':['Zip','Competition','True Blue','Silhouette','Enforcer','X-Terminator','TAC','Wild Boar','Big Game','Hunter','Magnum','LRT'],
+  'Alliant':['Bullseye','Sport Pistol','BE-86','Power Pistol','Power Pro 300-MP','2400','Unique','Blue Dot','Herco','Red Dot','Green Dot','Clay Dot','e3','Extra-Lite','20/28','410','Pro Reach','Steel','American Select','Promo','AR-Comp','Reloder 7','Reloder 10X','Reloder 15','Reloder 16','Reloder 17','Reloder 19','Reloder 22','Reloder 23','Reloder 25','Reloder 26','Reloder 33','Reloder 50','Power Pro Varmint','Power Pro 2000-MR','Power Pro 4000-MR'],
+  'Vihtavuori':['N310','N320','N330','N340','N350','3N37','3N38','N110','N120','N130','N133','N135','N140','N150','N160','N165','N170','N540','N550','N555','N560','N565','N568','N570','24N41','20N29'],
+  'Reload Swiss':['RS12','RS20','RS24','RS14','RS30','RS36','RS40','RS50','RS52','RS60','RS62','RS70','RS76','RS80'],
+  'Norma':['200','201','202','203-B','204','URP','217','MRP'],
+  'ADI':['APS350','AS30N','APS450','AP50N','AP70N','AP100','APS650','AS50N','AR2205','AR2207','AR2219','Bench Mark 1','Bench Mark 2','Bench Mark 8208','AR2206H','AR2208','AR2209','AR2213SC','AR2217','AR2225','AR2218','Trail Boss'],
+  'Shooters World':['Clean Shot','Auto Pistol','Ultimate Pistol','Major Pistol','Heavy Pistol','Sparta 100','Blackout','Tactical Rifle','AR Plus','Match Rifle','Precision Rifle','Long Rifle','Buffalo Rifle','SW4350','SW50BMG'],
+  'Lovex':['S011','S020','D032','D036','D037.1','D037.2','S030','S035','D013','S040','S053','S060','S062','S065','S070','S071','D060','D063','D073.4','D073.5','D073.6','D100'],
+  'Vectan':['Ba10','Ba9 1/2','Ba9','Ba7 1/2','SP2','Tubal 3000','SP7','Tubal 5000','Tubal 7000','Tubal 8000','SP9','SP11'],
+  'Vectan / Nobel Sport':['A24','AS','A1','A0','206V','206SV','D20','C7','Prima','Prima SV','GM3'],
+  'Maxam':['CSB1','CSB2','CSB3','CSB4','CSB5','CSB6','PSB1','PSB2','PSB3','PSB+','SSB+'],
+  'B&P':['BP 100 Light Pistol','BP 102 Pistol','BP 103 Magnum Pistol','BP 106 Light Rifle','BP 107 Medium Rifle','BP 108 Heavy Rifle','BP 109 Magnum Rifle','F2','MB','M410','M410/2'],
+  'Cheddite':['Aquila','Drago','Granular','JK6','Novecento'],
+  'GOEX':['GOEX Fg','GOEX FFg','GOEX FFFg','GOEX FFFFg','Olde Eynsford'],
+  'Schuetzen':['Schuetzen Reenactor','Schuetzen Cannon','Schuetzen Fg','Schuetzen FFg','Schuetzen FFFg','Schuetzen FFFFg'],
+  'Swiss Black Powder':['Swiss 1Fg','Swiss 1.5Fg','Swiss 2Fg','Swiss 3Fg','Swiss 4Fg'],
+  'CBC':['CBC 102','CBC 124','CBC 126','CBC 128','CBC 129','CBC 207','CBC 209','CBC 210','CBC 212','CBC 215','CBC 216','CBC 217','CBC 218','CBC 219','CBC 220','CBC 221','CBC 222','CBC 231','CBC 236','CBC 244','CBC 246','CBC 250','CBC 266'],
+  'FOX':['FOX CAÇA','FOX PC','FOX TP','FOX TP SPECIAL','FOX TRAP'],
+  'IMBEL':['BD521','BS223','BS308','BS380','BS762','PP 40','PV2P','REX 0900','REX 1200','REX 1624','REX 2836','REX 5100','Tucano','Tucano / PV2P'],
+  'Presidente':['Mantiqueira'],
+  'Thor':['BS Thor','Thor']
+};
+function atualizarModelosPolvora() {
+  const fab = document.getElementById('inpFabPolvora').value;
+  const sel = document.getElementById('inpModeloPolvora');
+  sel.innerHTML = '<option value="">— selecione modelo —</option>';
+  if (fab && PD_TRAJ[fab]) PD_TRAJ[fab].forEach(m => { const o=document.createElement('option'); o.textContent=m; sel.appendChild(o); });
+}
+
+// ═══════════════════════════════════════════
+// IMPORTAR DO CRONÓGRAFO
+// ═══════════════════════════════════════════
+function importFromCrono() {
+  // Tenta ler sessões salvas no localStorage (formato do Cronógrafo)
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('crono_'));
+  if (keys.length === 0) {
+    alert('Nenhuma sessão do Cronógrafo encontrada.\n\nAbra o Cronógrafo, faça uma sessão e salve. O V₀ (AVG) será importado automaticamente.');
+    return;
+  }
+  // Mostra última sessão
+  const last = JSON.parse(localStorage.getItem(keys[keys.length-1]));
+  if (last && last.avg) {
+    document.getElementById('inpV0').value = Math.round(last.avg);
+    document.getElementById('inpV0unit').value = 'fps';
+    const el = document.getElementById('cronoPerfil');
+    el.style.display = '';
+    el.textContent = `✅ Importado: ${last.caliber || 'Calibre desconhecido'} — AVG ${Math.round(last.avg)} fps (sessão ${last.date || ''})`;
+  }
+}
+
+// ═══════════════════════════════════════════
+// CAMPOS EXTRAS (RECARGA / ARMA / ÓPTICA)
+// ═══════════════════════════════════════════
+function getExtraParams() {
+  return {
+    nomeAtirador: document.getElementById('inpNomeAtirador').value.trim(),
+    data: document.getElementById('inpData').value,
+    modeloArma: document.getElementById('inpModeloArma').value.trim(),
+    canoCm: document.getElementById('inpCanoCm').value,
+    canoUnit: document.getElementById('inpCanoUnit').value,
+    fabOptica: document.getElementById('inpFabOptica').value.trim(),
+    modeloOptica: document.getElementById('inpModeloOptica').value.trim(),
+    tuboOptica: document.getElementById('inpTuboOptica').value,
+    aumentoOptica: document.getElementById('inpAumentoOptica').value.trim(),
+    oal: document.getElementById('inpOAL').value,
+    fabProj: document.getElementById('inpFabProj').value.trim(),
+    tipoProj: document.getElementById('inpTipoProj').value.trim(),
+    estojo: document.getElementById('inpEstojo').value.trim(),
+    altEstojo: document.getElementById('inpAltEstojo').value,
+    espoleta: document.getElementById('inpEspoleta').value,
+    fabPolvora: document.getElementById('inpFabPolvora').value,
+    modeloPolvora: document.getElementById('inpModeloPolvora').value,
+    lotePolvora: document.getElementById('inpLotePolvora').value.trim(),
+  };
+}
+function setExtraParams(e) {
+  if (!e) return;
+  if (e.nomeAtirador) document.getElementById('inpNomeAtirador').value = e.nomeAtirador;
+  if (e.data) document.getElementById('inpData').value = e.data;
+  if (e.modeloArma) document.getElementById('inpModeloArma').value = e.modeloArma;
+  if (e.canoCm) document.getElementById('inpCanoCm').value = e.canoCm;
+  if (e.canoUnit) document.getElementById('inpCanoUnit').value = e.canoUnit;
+  if (e.fabOptica) document.getElementById('inpFabOptica').value = e.fabOptica;
+  if (e.modeloOptica) document.getElementById('inpModeloOptica').value = e.modeloOptica;
+  if (e.tuboOptica) document.getElementById('inpTuboOptica').value = e.tuboOptica;
+  if (e.aumentoOptica) document.getElementById('inpAumentoOptica').value = e.aumentoOptica;
+  if (e.oal) document.getElementById('inpOAL').value = e.oal;
+  if (e.fabProj) document.getElementById('inpFabProj').value = e.fabProj;
+  if (e.tipoProj) document.getElementById('inpTipoProj').value = e.tipoProj;
+  if (e.estojo) document.getElementById('inpEstojo').value = e.estojo;
+  if (e.altEstojo) document.getElementById('inpAltEstojo').value = e.altEstojo;
+  if (e.espoleta) document.getElementById('inpEspoleta').value = e.espoleta;
+  if (e.fabPolvora) { document.getElementById('inpFabPolvora').value = e.fabPolvora; atualizarModelosPolvora(); }
+  if (e.modeloPolvora) document.getElementById('inpModeloPolvora').value = e.modeloPolvora;
+  if (e.lotePolvora) document.getElementById('inpLotePolvora').value = e.lotePolvora;
+}
+
+// ═══════════════════════════════════════════
+// CALCULAR
+// ═══════════════════════════════════════════
+function calcular() {
+  const v0raw = parseFloat(document.getElementById('inpV0').value) || 2600;
+  const unit = document.getElementById('inpV0unit').value;
+  const v0fps = unit === 'ms' ? v0raw / 0.3048 : v0raw;
+
+  const params = {
+    v0fps,
+    bc: parseFloat(document.getElementById('inpBC').value) || 0.243,
+    bcType: document.getElementById('inpBCtype').value,
+    pesoGr: parseFloat(document.getElementById('inpPeso').value) || 168,
+    scopeHeightMm: parseFloat(document.getElementById('inpScopeH').value) || 40,
+    zeroDist: parseFloat(document.getElementById('inpZero').value) || 100,
+    altM: parseFloat(document.getElementById('inpAlt').value) || 0,
+    tempC: parseFloat(document.getElementById('inpTemp').value) || 15,
+    pressHPa: parseFloat(document.getElementById('inpPress').value) || 1013,
+    humPct: parseFloat(document.getElementById('inpHum').value) || 50,
+    windKmh: parseFloat(document.getElementById('inpWind').value) || 0,
+    windAngDeg: parseFloat(document.getElementById('inpWindAng').value) || 90,
+    maxDist: parseFloat(document.getElementById('inpMaxDist').value) || 800,
+    increment: parseFloat(document.getElementById('inpIncr').value) || 50,
+  };
+
+  const extra = getExtraParams();
+  const r = calcTrajetoria(params);
+  renderResults(params, r, extra);
+}
+
+function renderResults(p, r, extra) {
+  const { rows, transIdx, subIdx } = r;
+  const angUnit = document.getElementById('inpUnit').value;
+  const cal = document.getElementById('inpCalibre').value || '—';
+  const bcType = p.bcType;
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsArea').style.display = '';
+
+  const dataFmt = extra && extra.data ? extra.data.split('-').reverse().join('/') : '';
+  const nomeAtirador = extra && extra.nomeAtirador ? extra.nomeAtirador : '';
+  document.getElementById('resTitle').textContent =
+    `${cal} · ${p.pesoGr}gr · BC ${bcType} ${p.bc.toFixed(3)} · V₀ ${Math.round(p.v0fps)} fps`;
+  const subParts = [];
+  if (nomeAtirador) subParts.push(`Atirador: ${nomeAtirador}`);
+  if (dataFmt) subParts.push(`Data: ${dataFmt}`);
+  subParts.push(`Zero ${p.zeroDist}m · Óptica +${p.scopeHeightMm}mm · Alt ${p.altM}m · ${p.tempC}°C · Vento ${p.windKmh}km/h`);
+  if (extra) {
+    if (extra.modeloArma) subParts.push(`Arma: ${extra.modeloArma}${extra.canoCm ? ' • Cano '+extra.canoCm+extra.canoUnit : ''}`);
+    if (extra.fabOptica||extra.modeloOptica) subParts.push(`Óptica: ${[extra.fabOptica,extra.modeloOptica,extra.aumentoOptica,extra.tuboOptica].filter(Boolean).join(' ')}`);
+    const recParts=[];
+    if (extra.fabProj||extra.tipoProj) recParts.push(`Proj: ${[extra.fabProj,extra.tipoProj].filter(Boolean).join(' ')}`);
+    if (extra.oal) recParts.push(`OAL: ${extra.oal}"`);
+    if (extra.estojo) recParts.push(`Estojo: ${extra.estojo}${extra.altEstojo?' ('+extra.altEstojo+'mm)':''}`);
+    if (extra.espoleta) recParts.push(`Espoleta: ${extra.espoleta}`);
+    if (extra.fabPolvora||extra.modeloPolvora) recParts.push(`Pólvora: ${[extra.fabPolvora,extra.modeloPolvora,extra.lotePolvora].filter(Boolean).join(' ')}`);
+    if (recParts.length) subParts.push(recParts.join(' · '));
+  }
+  document.getElementById('resSub').textContent = subParts.join('  |  ');
+
+  // Métricas
+  const r0 = rows[0], rLast = rows[rows.length-1];
+  const grid = document.getElementById('metricGrid');
+  const dens = r.densRatio;
+  grid.innerHTML = `
+    <div class="metric-box"><div class="metric-lbl">V₀</div><div class="metric-val">${Math.round(p.v0fps)}<span class="metric-unit">fps</span></div></div>
+    <div class="metric-box"><div class="metric-lbl">V₀ m/s</div><div class="metric-val">${Math.round(p.v0fps*0.3048)}<span class="metric-unit">m/s</span></div></div>
+    <div class="metric-box"><div class="metric-lbl">E₀ (boca)</div><div class="metric-val">${Math.round(0.5*(p.pesoGr/7000*0.453592)*(p.v0fps*0.3048)**2)}<span class="metric-unit">J</span></div></div>
+    <div class="metric-box"><div class="metric-lbl">Zero</div><div class="metric-val">${p.zeroDist}<span class="metric-unit">m</span></div></div>
+    <div class="metric-box"><div class="metric-lbl">Ângulo lançamento</div><div class="metric-val">${(r.launchAngle*1000).toFixed(2)}<span class="metric-unit">MIL</span></div></div>
+    <div class="metric-box"><div class="metric-lbl">Fator densidade</div><div class="metric-val">${(dens*100).toFixed(1)}<span class="metric-unit">%</span></div></div>
+    ${transIdx >= 0 ? `<div class="metric-box" style="border-color:var(--warn-b)"><div class="metric-lbl" style="color:var(--warn)">Transônica</div><div class="metric-val" style="color:var(--warn)">${rows[transIdx].dist}<span class="metric-unit">m</span></div></div>` : ''}
+    ${subIdx >= 0 ? `<div class="metric-box" style="border-color:var(--red-b)"><div class="metric-lbl" style="color:var(--red)">Subsônica</div><div class="metric-val" style="color:var(--red)">${rows[subIdx].dist}<span class="metric-unit">m</span></div></div>` : ''}
+  `;
+
+  // MOA/MIL helper
+  function toAngular(dropCm, dist) {
+    if (dist === 0) return '—';
+    if (angUnit === 'mil') return (Math.abs(dropCm) / dist * 10).toFixed(2);
+    else return (Math.abs(dropCm) / dist / 2.908 * 100).toFixed(2);
+  }
+  const angLbl = angUnit === 'mil' ? 'MIL' : 'MOA';
+
+  // Tabela
+  const thead = document.getElementById('resThead');
+  const tbody = document.getElementById('resTbody');
+  thead.innerHTML = `<tr>
+    <th>Dist</th>
+    <th>Queda (cm)</th>
+    <th>Queda (in)</th>
+    <th>${angLbl} ↕</th>
+    <th>V (fps)</th>
+    <th>V (m/s)</th>
+    <th>Energia (J)</th>
+    <th>Vento (cm)</th>
+    <th>TOF (s)</th>
+  </tr>`;
+
+  tbody.innerHTML = rows.map((row, i) => {
+    const isZero = Math.abs(row.dropCm) < 1.5 && Math.abs(row.dist - p.zeroDist) < 1;
+    const isTrans = transIdx >= 0 && i === transIdx;
+    const isSub = subIdx >= 0 && i === subIdx;
+    const cls = isZero ? 'zero-row' : (isTrans ? 'crit' : '');
+    const angVal = toAngular(row.dropCm, row.dist);
+    const dropSign = row.dropCm >= 0 ? '+' : '';
+    const badge = isZero ? `<span class="badge-sm" style="background:rgba(192,154,58,.2);color:var(--gold);border:1px solid var(--gold-d)">ZERO</span>` :
+      isTrans ? `<span class="badge-sm" style="background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-b)">TRANS</span>` :
+      isSub ? `<span class="badge-sm" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-b)">SUB</span>` : '';
+    const dropIn = (row.dropCm / 2.54).toFixed(2);
+    const dropInSign = row.dropCm >= 0 ? '+' : '-';
+    return `<tr class="${cls}">
+      <td>${row.dist}m ${badge}</td>
+      <td>${dropSign}${row.dropCm.toFixed(1)}</td>
+      <td>${dropInSign}${Math.abs(parseFloat(dropIn)).toFixed(2)}</td>
+      <td>${row.dropCm >= 0 ? '+' : '-'}${angVal}</td>
+      <td>${Math.round(row.vfps)}</td>
+      <td>${Math.round(row.vmps)}</td>
+      <td>${Math.round(row.joules)}</td>
+      <td>${row.windDriftCm.toFixed(1)}</td>
+      <td>${row.tof.toFixed(3)}</td>
+    </tr>`;
+  }).join('');
+
+  // Legenda angular
+  const ls = document.getElementById('legendSection');
+  ls.innerHTML = `<div class="info-card" style="display:flex;gap:16px;flex-wrap:wrap">
+    <div><div class="metric-lbl" style="margin-bottom:4px">1 MIL / MRAD</div><div style="font-family:'Share Tech Mono',mono;font-size:13px;color:var(--gold-l)">= 10cm @ 100m &nbsp;· &nbsp;50cm @ 500m</div></div>
+    <div><div class="metric-lbl" style="margin-bottom:4px">1 MOA</div><div style="font-family:'Share Tech Mono',mono;font-size:13px;color:var(--gold-l)">= 2,91cm @ 100m &nbsp;· &nbsp;14,5cm @ 500m</div></div>
+    <div><div class="metric-lbl" style="margin-bottom:4px">Densidade ar</div><div style="font-family:'Share Tech Mono',mono;font-size:13px;color:var(--gold-l)">${(r.densRatio*100).toFixed(1)}% do padrão (${p.altM}m · ${p.tempC}°C)</div></div>
+  </div>`;
+
+  // CHART SVG
+  renderChart(rows, p.zeroDist, p.scopeHeightMm);
+}
+
+function renderChart(rows, zeroDist, scopeHeightMm) {
+  const svg = document.getElementById('trajectoryChart');
+  const W=800, H=200, pad={l:50,r:20,t:20,b:30};
+  const iW=W-pad.l-pad.r, iH=H-pad.t-pad.b;
+
+  // Usar altura acima do cano para mostrar a parábola real
+  const heights = rows.map(r=>r.heightCm);
+  const dists = rows.map(r=>r.dist);
+  const losCm = scopeHeightMm / 10; // linha de mira = altura do scope acima do cano
+  const minH = Math.min(...heights, -30);
+  const maxH = Math.max(...heights, losCm + 5);
+  const maxDist = dists[dists.length-1];
+
+  const sx = d => pad.l + (d/maxDist)*iW;
+  const sy = h => pad.t + iH - ((h-minH)/(maxH-minH))*iH;
+
+  // linha do cano (y=0)
+  const yBore = sy(0);
+  // linha de mira (y = losCm)
+  const yLos = sy(losCm);
+
+  let path = rows.map((r,i) => `${i===0?'M':'L'}${sx(r.dist).toFixed(1)},${sy(r.heightCm).toFixed(1)}`).join(' ');
+
+  // pontos onde a trajetória cruza a linha de mira (zero)
+  const zeroCircles = rows.filter(r=>Math.abs(r.dist-zeroDist)<1)
+    .map(r=>`<circle cx="${sx(r.dist).toFixed(1)}" cy="${sy(r.heightCm).toFixed(1)}" r="4" fill="#c09a3a"><title>Zero: ${r.dist}m</title></circle>`).join('');
+
+  svg.innerHTML = `
+    <!-- fundo -->
+    <rect x="${pad.l}" y="${pad.t}" width="${iW}" height="${iH}" fill="rgba(22,22,34,.7)" rx="2"/>
+    <!-- linha do cano (altura 0) -->
+    <line x1="${pad.l}" y1="${yBore.toFixed(1)}" x2="${pad.l+iW}" y2="${yBore.toFixed(1)}" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="2,3"/>
+    <text x="${pad.l-4}" y="${(yBore+4).toFixed(1)}" fill="#6e6e58" font-size="9" text-anchor="end" font-family="Share Tech Mono">cano</text>
+    <!-- linha de mira (LOS) -->
+    <line x1="${pad.l}" y1="${yLos.toFixed(1)}" x2="${pad.l+iW}" y2="${yLos.toFixed(1)}" stroke="#383850" stroke-width="1" stroke-dasharray="5,4"/>
+    <text x="${pad.l-4}" y="${(yLos+4).toFixed(1)}" fill="#8b7332" font-size="9" text-anchor="end" font-family="Share Tech Mono">LOS</text>
+    <!-- trajetória do projétil (parábola) -->
+    <path d="${path}" fill="none" stroke="#c09a3a" stroke-width="2"/>
+    <!-- ponto zero -->
+    ${zeroCircles}
+    <!-- eixo X labels -->
+    ${rows.filter((_,i)=>i%(Math.max(1,Math.floor(rows.length/8)))===0).map(r=>`
+      <line x1="${sx(r.dist).toFixed(1)}" y1="${(pad.t+iH).toFixed(1)}" x2="${sx(r.dist).toFixed(1)}" y2="${(pad.t+iH+4).toFixed(1)}" stroke="#383850"/>
+      <text x="${sx(r.dist).toFixed(1)}" y="${(H-6).toFixed(1)}" fill="#6e6e58" font-size="9" text-anchor="middle" font-family="Share Tech Mono">${r.dist}m</text>
+    `).join('')}
+    <!-- eixo Y labels -->
+    ${[minH, 0, maxH].map(h=>`
+      <text x="${(pad.l-4).toFixed(1)}" y="${(sy(h)+4).toFixed(1)}" fill="#6e6e58" font-size="9" text-anchor="end" font-family="Share Tech Mono">${Math.round(h)}cm</text>
+    `).join('')}
+    <!-- legenda -->
+    <line x1="${pad.l+10}" y1="${(pad.t+12)}" x2="${pad.l+28}" y2="${(pad.t+12)}" stroke="#c09a3a" stroke-width="2"/>
+    <text x="${pad.l+32}" y="${(pad.t+16)}" fill="#c09a3a" font-size="9" font-family="Share Tech Mono">Projétil</text>
+    <line x1="${pad.l+80}" y1="${(pad.t+12)}" x2="${pad.l+98}" y2="${(pad.t+12)}" stroke="#383850" stroke-width="1" stroke-dasharray="5,4"/>
+    <text x="${pad.l+102}" y="${(pad.t+16)}" fill="#8b7332" font-size="9" font-family="Share Tech Mono">Linha de mira</text>
+  `;
+}
+
+// ═══════════════════════════════════════════
+// PERFIS
+// ═══════════════════════════════════════════
+function getParams() {
+  return {
+    calibre: document.getElementById('inpCalibre').value,
+    bc: document.getElementById('inpBC').value,
+    bcType: document.getElementById('inpBCtype').value,
+    peso: document.getElementById('inpPeso').value,
+    diam: document.getElementById('inpDiam').value,
+    v0: document.getElementById('inpV0').value,
+    v0unit: document.getElementById('inpV0unit').value,
+    scopeH: document.getElementById('inpScopeH').value,
+    zero: document.getElementById('inpZero').value,
+    alt: document.getElementById('inpAlt').value,
+    temp: document.getElementById('inpTemp').value,
+    press: document.getElementById('inpPress').value,
+    hum: document.getElementById('inpHum').value,
+    wind: document.getElementById('inpWind').value,
+    windAng: document.getElementById('inpWindAng').value,
+    maxDist: document.getElementById('inpMaxDist').value,
+    incr: document.getElementById('inpIncr').value,
+    angUnit: document.getElementById('inpUnit').value,
+  };
+}
+function setParams(p) {
+  document.getElementById('inpCalibre').value = p.calibre||'';
+  document.getElementById('inpBC').value = p.bc||0.243;
+  document.getElementById('inpBCtype').value = p.bcType||'G7';
+  document.getElementById('inpPeso').value = p.peso||168;
+  document.getElementById('inpDiam').value = p.diam||0.308;
+  document.getElementById('inpV0').value = p.v0||2600;
+  document.getElementById('inpV0unit').value = p.v0unit||'fps';
+  document.getElementById('inpScopeH').value = p.scopeH||40;
+  document.getElementById('inpZero').value = p.zero||100;
+  document.getElementById('inpAlt').value = p.alt||800;
+  document.getElementById('inpTemp').value = p.temp||25;
+  document.getElementById('inpPress').value = p.press||1013;
+  document.getElementById('inpHum').value = p.hum||60;
+  document.getElementById('inpWind').value = p.wind||0;
+  document.getElementById('inpWindAng').value = p.windAng||90;
+  document.getElementById('inpMaxDist').value = p.maxDist||800;
+  document.getElementById('inpIncr').value = p.incr||50;
+  document.getElementById('inpUnit').value = p.angUnit||'mil';
+}
+
+function salvarPerfil() {
+  const nome = prompt('Nome do perfil (ex: IA2 .308 168gr 2600fps):');
+  if (!nome) return;
+  const key = 'bdc_perfil_' + Date.now();
+  localStorage.setItem(key, JSON.stringify({ nome, data: new Date().toLocaleDateString('pt-BR'), params: getParams() }));
+  renderPerfis();
+}
+
+function renderPerfis() {
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('bdc_perfil_')).sort();
+  const sec = document.getElementById('profSection');
+  const list = document.getElementById('profList');
+  if (keys.length === 0) { sec.style.display='none'; return; }
+  sec.style.display = '';
+  list.innerHTML = keys.map(k => {
+    const p = JSON.parse(localStorage.getItem(k));
+    return `<div class="prof-item" onclick="loadPerfil('${k}')">
+      <div><div class="prof-item-name">${p.nome}</div><div class="prof-item-meta">${p.data} · ${p.params.calibre||'—'}</div></div>
+      <button class="prof-del" onclick="event.stopPropagation();delPerfil('${k}')" title="Excluir">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function loadPerfil(key) {
+  const p = JSON.parse(localStorage.getItem(key));
+  if (p) { setParams(p.params); calcular(); }
+}
+function delPerfil(key) {
+  localStorage.removeItem(key); renderPerfis();
+}
+
+function exportarPDF() {
+  window.print();
+}
+
+// Restaurar último estado
+window.addEventListener('load', () => {
+  const last = localStorage.getItem('bdc_last_params');
+  if (last) { try { const d=JSON.parse(last); setParams(d); if(d.extra) setExtraParams(d.extra); } catch(e){} }
+  renderPerfis();
+  const today = new Date().toISOString().split('T')[0];
+  if (!document.getElementById('inpData').value) document.getElementById('inpData').value = today;
+});
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('bdc_last_params', JSON.stringify({...getParams(), extra: getExtraParams()}));
+});
+</script>
+</body>
+</html>
