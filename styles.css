@@ -1,8 +1,0 @@
-/* ALE308WIN Design System — Entry Point
-   Import this single file in any consumer project.
-   All rules live in the imported partials below.   */
-
-@import './tokens/fonts.css';
-@import './tokens/colors.css';
-@import './tokens/typography.css';
-@import './tokens/spacing.css';
